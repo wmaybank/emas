@@ -1,88 +1,132 @@
-# EMA Chapelco - Sistema de Monitoreo Meteorológico
+# EMAS Weather Monitoring System
 
-Sistema completo de monitoreo meteorológico para estaciones Davis Vantage Pro 2 con WeatherLink Live, desarrollado para EMA Chapelco.
+Sistema de monitoreo meteorológico para estaciones locales **WeatherLink Live** de Davis Instruments.
 
-## 🚀 Características
+## 🌟 Características Principales
 
-- **Monitoreo en tiempo real** de múltiples estaciones meteorológicas
-- **Integración con WeatherLink Live** para datos Davis Vantage Pro 2
-- **Soporte UDP** para estaciones locales
-- **API REST completa** con documentación
-- **WebSocket** para datos en tiempo real
-- **Sistema de alertas** configurable
-- **Generación de reportes** automática y manual
-- **Exportación de datos** en múltiples formatos
-- **Base de datos SQLite** con respaldos automáticos
-- **Logging avanzado** con rotación automática
-- **Seguridad** con Helmet y CORS configurado
+- **Monitoreo en Tiempo Real**: Datos meteorológicos actualizados cada 30 segundos
+- **Múltiples Estaciones**: Soporte para hasta 10 estaciones WeatherLink Live locales
+- **API REST Completa**: Endpoints para estaciones, datos y reportes
+- **WebSocket en Tiempo Real**: Transmisión instantánea de datos
+- **Sistema de Alertas**: Notificaciones automáticas basadas en umbrales
+- **Reportes Automáticos**: Generación de reportes diarios, mensuales y personalizados
+- **Base de Datos SQLite**: Almacenamiento local eficiente
+- **Logging Centralizado**: Sistema robusto de logs con rotación automática
+- **Configuración Flexible**: Variables de entorno para personalización
 
-## 📋 Requisitos
+## 🏗️ Arquitectura del Sistema
 
-- Node.js 16.x o superior
-- npm 8.x o superior
-- Acceso a estaciones Davis Vantage Pro 2
-- Cuenta de WeatherLink Live (opcional)
+### Estaciones Locales
+Cada estación meteorológica tiene su propio controlador **WeatherLink Live (WLL)** que:
+- Expone una API HTTP local en `http://<IP_WLL:puerto>/v1/current_conditions`
+- Transmite datos en tiempo real por UDP puerto 22222
+- Funciona solo en la red local (no requiere internet)
+- Soporta requests HTTP cada 10 segundos
 
-## 🛠️ Instalación
+### Servidor Central
+- **Polling HTTP**: Consulta periódica a cada estación local
+- **Listener UDP**: Escucha transmisiones en tiempo real
+- **Procesamiento**: Normaliza y valida datos de múltiples sensores
+- **Almacenamiento**: Guarda datos en base de datos SQLite
+- **Distribución**: Envía datos por WebSocket a clientes conectados
 
-### 1. Clonar el repositorio
+## 📋 Requisitos del Sistema
+
+### Hardware
+- **Servidor**: Cualquier máquina con Node.js (Raspberry Pi, PC, servidor)
+- **Red**: Acceso a la red local donde están las estaciones
+- **Almacenamiento**: Mínimo 1GB para datos y logs
+
+### Software
+- **Node.js**: Versión 16 o superior
+- **npm**: Gestor de paquetes de Node.js
+- **Sistema Operativo**: Windows, macOS, Linux
+
+### Estaciones Meteorológicas
+- **WeatherLink Live** de Davis Instruments
+- **Configuradas en la misma red local**
+- **IPs estáticas o DHCP reservado**
+
+## 🚀 Instalación
+
+### 1. Clonar el Repositorio
 ```bash
-git clone <repository-url>
+git clone https://github.com/wmaybank/emas.git
 cd emas
 ```
 
-### 2. Instalar dependencias
+### 2. Instalar Dependencias
 ```bash
-npm install
+npm run install:all
 ```
 
-### 3. Configurar variables de entorno
+### 3. Configurar Variables de Entorno
 ```bash
+# Copiar archivo de ejemplo
 cp backend/env.example backend/.env
+
+# Editar configuración
+nano backend/.env
 ```
 
-Editar `backend/.env` con tus configuraciones:
-- API keys de WeatherLink Live
-- Configuración de estaciones UDP
-- Configuración de base de datos
-- Configuración de seguridad
+#### Configuración de Estaciones
+```bash
+# Lista de IPs de estaciones en la red local
+WEATHER_STATIONS=192.168.1.100:80,192.168.1.101:80,192.168.1.102:80
 
-### 4. Inicializar la base de datos
+# Intervalo de polling HTTP (segundos)
+STATION_POLLING_INTERVAL=30
+
+# Timeout para requests HTTP (ms)
+STATION_REQUEST_TIMEOUT=5000
+```
+
+### 4. Inicializar Base de Datos
 ```bash
 npm run setup:db
 ```
 
-### 5. Iniciar el servidor
+### 5. Iniciar el Sistema
 ```bash
-# Desarrollo
+# Modo desarrollo
 npm run dev
 
-# Producción
+# Modo producción
 npm start
 ```
 
-## 🏗️ Arquitectura
+## ⚙️ Configuración
 
+### Variables de Entorno Principales
+
+#### Servidor
+```bash
+NODE_ENV=development
+PORT=3001
+HOST=localhost
 ```
-emas/
-├── backend/
-│   ├── src/
-│   │   ├── app.js                 # Servidor principal
-│   │   ├── controllers/           # Controladores de API
-│   │   │   ├── stationsController.js
-│   │   │   ├── dataController.js
-│   │   │   └── reportsController.js
-│   │   ├── services/             # Servicios de negocio
-│   │   │   ├── databaseService.js
-│   │   │   ├── weatherLinkService.js
-│   │   │   └── websocketService.js
-│   │   └── utils/                # Utilidades
-│   │       ├── logger.js
-│   │       └── unitConverter.js
-│   ├── data/                     # Base de datos SQLite
-│   ├── logs/                     # Archivos de log
-│   └── backups/                  # Respaldos automáticos
-└── package.json
+
+#### Estaciones Locales
+```bash
+# Lista de IPs separadas por comas
+WEATHER_STATIONS=192.168.1.100:80,192.168.1.101:80
+
+# Configuración de polling
+STATION_POLLING_INTERVAL=30
+STATION_REQUEST_TIMEOUT=5000
+```
+
+#### UDP y WebSocket
+```bash
+UDP_PORT=22222
+UDP_ENABLED=true
+WS_PATH=/ws/realtime
+```
+
+#### Base de Datos
+```bash
+DB_PATH=./data/weather.db
+DB_BACKUP_PATH=./backups/
 ```
 
 ## 🔌 API Endpoints
@@ -90,18 +134,18 @@ emas/
 ### Estaciones (`/api/stations`)
 - `GET /` - Listar todas las estaciones
 - `GET /:id` - Obtener estación específica
-- `POST /` - Crear nueva estación
+- `GET /:id/status` - Estado de conectividad
+- `POST /` - Agregar nueva estación
 - `PUT /:id` - Actualizar estación
 - `DELETE /:id` - Eliminar estación
-- `GET /:id/status` - Estado de la estación
 
 ### Datos (`/api/data`)
 - `GET /current` - Datos actuales de todas las estaciones
-- `GET /current/:stationId` - Datos actuales de una estación
+- `GET /current/:stationId` - Datos actuales de estación específica
 - `GET /historical` - Datos históricos con filtros
-- `GET /statistics` - Estadísticas de los datos
+- `GET /statistics` - Estadísticas de datos
 - `GET /parameters` - Parámetros disponibles
-- `GET /export` - Exportar datos en CSV
+- `GET /export` - Exportar datos a CSV
 - `GET /alerts` - Alertas activas
 - `POST /alerts` - Crear nueva alerta
 
@@ -112,192 +156,177 @@ emas/
 - `GET /summary` - Resumen de datos
 - `GET /extremes` - Valores extremos
 - `GET /trends` - Análisis de tendencias
-- `GET /export/:type` - Exportar reportes
+- `GET /export/:type` - Exportar reporte (PDF/CSV)
 - `GET /templates` - Plantillas disponibles
-- `POST /schedule` - Programar reportes
+- `POST /schedule` - Programar reporte
 
-### Sistema
-- `GET /api/health` - Estado del sistema
-- `GET /` - Información de la API
-- `GET /ws/realtime` - WebSocket para datos en tiempo real
+### Sistema (`/api/health`)
+- `GET /` - Estado de salud del sistema
 
 ## 📊 Parámetros Meteorológicos
 
-El sistema soporta los siguientes parámetros:
-- **Temperatura** (°C, °F)
-- **Humedad relativa** (%)
-- **Presión barométrica** (hPa, inHg)
-- **Velocidad del viento** (km/h, mph, m/s)
-- **Dirección del viento** (grados)
-- **Precipitación** (mm, pulgadas)
-- **Radiación solar** (W/m²)
-- **UV Index**
-- **Punto de rocío** (°C, °F)
-- **Sensación térmica** (°C, °F)
+### Sensores ISS (Integrated Sensor Suite)
+- **Temperatura**: Actual, punto de rocío, índice de calor, sensación térmica
+- **Humedad**: Humedad relativa actual
+- **Viento**: Velocidad y dirección (última, 1 min, 2 min, 10 min)
+- **Lluvia**: Tasa, acumulación (15 min, 1 hora, 24 horas, tormenta)
+- **Radiación Solar**: W/m² y índice UV
+- **Sistema**: Estado de batería, estado de recepción
 
-## 🔧 Configuración
+### Sensores de Suelo/Hojas
+- **Temperatura del Suelo**: 4 slots de sensores
+- **Humedad del Suelo**: 4 slots de sensores
+- **Humedad de Hojas**: 2 slots de sensores
 
-### Variables de Entorno Principales
+### Sensores LSS (Leaf/Soil Station)
+- **Barómetro**: Presión barométrica, tendencia, altímetro
+- **Temperatura/Humedad**: Múltiples sensores con máximos y mínimos
 
-```bash
-# Servidor
-NODE_ENV=development
-PORT=3001
+## 🔧 Monitoreo y Logs
 
-# WeatherLink Live
-WEATHERLINK_API_KEY=your_key
-WEATHERLINK_API_SECRET=your_secret
-
-# Base de datos
-DB_PATH=./data/weather.db
-
-# UDP
-UDP_PORT=22222
-UDP_HOST=0.0.0.0
+### Estructura de Logs
+```
+logs/
+├── error.log      # Solo errores
+├── combined.log   # Todos los logs
+└── backups/       # Logs rotados
 ```
 
-### Configuración de Estaciones
+### Niveles de Log
+- **error**: Errores del sistema
+- **warn**: Advertencias
+- **info**: Información general
+- **debug**: Información detallada
 
-Las estaciones se configuran a través de la API o directamente en la base de datos:
-
-```json
-{
-  "name": "Estación Base",
-  "type": "davis_vantage_pro2",
-  "location": {
-    "latitude": -40.123,
-    "longitude": -71.456,
-    "altitude": 1000
-  },
-  "weatherlink": {
-    "deviceId": "12345",
-    "apiKey": "your_key"
-  },
-  "udp": {
-    "enabled": true,
-    "port": 22222
-  }
-}
-```
-
-## 📈 Monitoreo y Logs
-
-### Logs del Sistema
-- **Error logs**: `logs/error.log`
-- **Combined logs**: `logs/combined.log`
-- **Rotación automática** cada 5MB
-- **Retención** configurable
-
-### Métricas de Monitoreo
-- Estado de estaciones
-- Tiempo de respuesta de API
-- Uso de memoria y CPU
-- Conexiones WebSocket activas
-- Errores y excepciones
+### Rotación Automática
+- **Tamaño máximo**: 5MB por archivo
+- **Archivos máximos**: 5 archivos por tipo
+- **Limpieza**: Logs antiguos se eliminan automáticamente
 
 ## 🚨 Sistema de Alertas
 
 ### Tipos de Alertas
-- **Umbrales**: Cuando un parámetro supera un valor
-- **Tendencias**: Cambios significativos en el tiempo
-- **Estado**: Estaciones offline o con errores
-- **Calidad**: Datos anómalos o fuera de rango
+- **Temperatura**: Mínima/máxima
+- **Humedad**: Mínima/máxima
+- **Viento**: Velocidad máxima
+- **Lluvia**: Acumulación máxima
+- **Presión**: Mínima/máxima
 
-### Configuración de Alertas
-```json
-{
-  "stationId": 1,
-  "parameter": "temperature",
-  "threshold": 30,
-  "condition": "greater_than",
-  "message": "Temperatura alta detectada"
-}
+### Configuración
+```bash
+# Verificar alertas cada 60 segundos
+ALERT_CHECK_INTERVAL=60
+
+# Retener alertas por 30 días
+ALERT_RETENTION_DAYS=30
 ```
 
-## 📊 Reportes
+## 📈 Tipos de Reportes
 
-### Tipos de Reportes
-- **Diarios**: Resumen de 24 horas
-- **Mensuales**: Estadísticas del mes
-- **Personalizados**: Períodos y parámetros específicos
-- **Tendencias**: Análisis de cambios temporales
+### Reportes Automáticos
+- **Diario**: Resumen de 24 horas
+- **Mensual**: Estadísticas del mes
+- **Personalizado**: Rango de fechas específico
+
+### Contenido de Reportes
+- **Resumen**: Valores promedio, máximos y mínimos
+- **Gráficos**: Tendencias temporales
+- **Extremos**: Valores máximos y mínimos
+- **Análisis**: Tendencias y patrones
 
 ### Formatos de Exportación
-- **CSV**: Para análisis en Excel
-- **PDF**: Para presentaciones y archivo
-- **JSON**: Para integración con otros sistemas
+- **CSV**: Datos tabulares
+- **PDF**: Reportes formateados
 
 ## 🔒 Seguridad
 
-- **Helmet.js** para headers de seguridad
-- **CORS** configurado para dominios específicos
-- **Rate limiting** en endpoints críticos
-- **Validación** de entrada en todos los endpoints
-- **Sanitización** de datos de entrada
+### Middleware de Seguridad
+- **Helmet**: Headers HTTP seguros
+- **CORS**: Control de acceso entre dominios
+- **Compresión**: Optimización de respuestas
+
+### Configuración CORS
+```bash
+# Dominios permitidos
+CORS_ORIGINS=http://localhost:3000,http://ema.chapelco.local,https://ema.chapelco.local
+```
 
 ## 🚀 Despliegue
 
-### Desarrollo
+### Entorno de Desarrollo
 ```bash
 npm run dev
 ```
 
-### Producción
+### Entorno de Producción
 ```bash
-npm run build
 npm start
 ```
 
-### Docker (próximamente)
+### Variables de Producción
 ```bash
-docker build -t emas-weather .
-docker run -p 3001:3001 emas-weather
+NODE_ENV=production
+LOG_LEVEL=warn
+HELMET_ENABLED=true
+COMPRESSION_ENABLED=true
 ```
 
 ## 🧪 Testing
 
+### Ejecutar Tests
 ```bash
-# Tests unitarios
 npm test
+```
 
-# Tests de integración
+### Tests de Integración
+```bash
 npm run test:integration
+```
 
-# Cobertura de código
+### Cobertura de Código
+```bash
 npm run test:coverage
 ```
 
 ## 📝 Contribución
 
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+### Guías de Contribución
+1. Fork del repositorio
+2. Crear rama para feature (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit de cambios (`git commit -am 'Agregar nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Crear Pull Request
+
+### Estándares de Código
+- **ESLint**: Linting de JavaScript
+- **Prettier**: Formateo de código
+- **JSDoc**: Documentación de funciones
 
 ## 📄 Licencia
 
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
 
 ## 👥 Autores
 
-- **EMA Chapelco** - *Desarrollo inicial* - [EMA Chapelco](https://ema.chapelco.local)
+- **Equipo EMAS** - Desarrollo inicial
+- **Contribuidores** - Mejoras y mantenimiento
 
-## 🙏 Agradecimientos
+## 🆘 Soporte
 
-- Davis Instruments por la documentación de WeatherLink Live
-- Comunidad de Node.js por las librerías utilizadas
-- Equipo de desarrollo de EMA Chapelco
+### Documentación
+- [API Reference](docs/api.md)
+- [Configuration Guide](docs/configuration.md)
+- [Troubleshooting](docs/troubleshooting.md)
 
-## 📞 Soporte
+### Contacto
+- **Issues**: [GitHub Issues](https://github.com/wmaybank/emas/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/wmaybank/emas/discussions)
 
-Para soporte técnico o preguntas:
-- **Email**: soporte@ema.chapelco.local
-- **Documentación**: [Wiki del proyecto](https://wiki.ema.chapelco.local)
-- **Issues**: [GitHub Issues](https://github.com/ema-chapelco/emas/issues)
+### Recursos Adicionales
+- [WeatherLink Live Documentation](https://weatherlink.github.io/weatherlink-live-local-api/)
+- [Davis Instruments](https://www.davisinstruments.com/)
+- [Node.js Documentation](https://nodejs.org/docs/)
 
 ---
 
-**Versión**: 1.0.0  
-**Última actualización**: Diciembre 2024  
-**Estado**: En desarrollo activo
+**EMAS Weather Monitoring System** - Monitoreo meteorológico profesional para estaciones locales
