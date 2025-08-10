@@ -1,0 +1,33 @@
+{
+  "name": "emas-weather-monitoring",
+  "version": "1.0.0",
+  "description": "Sistema de Monitoreo Meteorológico WeatherLink Live para estaciones Davis Vantage Pro 2",
+  "main": "backend/src/app.js",
+  "scripts": {
+    "start": "node backend/src/app.js",
+    "dev": "nodemon backend/src/app.js",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "echo 'Backend built'",
+    "build:frontend": "cd frontend && npm run build",
+    "install:all": "npm install && cd frontend && npm install",
+    "setup:db": "node backend/src/scripts/setupDatabase.js"
+  },
+  "keywords": ["weather", "meteorology", "davis", "weatherlink", "monitoring"],
+  "author": "EMA Chapelco",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "ws": "^8.14.2",
+    "axios": "^1.6.0",
+    "node-cron": "^3.0.3",
+    "winston": "^3.11.0",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
