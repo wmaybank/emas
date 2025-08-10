@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  # Servicio principal de la aplicación (desarrollo)
+  emas-app:
+    build:
+      context: ..
+      dockerfile: DevOps/Dockerfile
+    container_name: emas-weather-app-dev
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - HOST=0.0.0.0
+      - DB_PATH=/app/data/weather.db
+      - DB_BACKUP_PATH=/app/backups/
+      - LOG_LEVEL=debug
+      - WEATHER_STATIONS=192.168.1.100:80,192.168.1.101:80
+      - STATION_POLLING_INTERVAL=30
+      - STATION_REQUEST_TIMEOUT=5000
+      - UDP_ENABLED=true
+      - UDP_PORT=22222
+      - UDP_HOST=0.0.0.0
+      - UDP_BROADCAST_INTERVAL=2.5
+      - WS_PATH=/ws/realtime
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:3001
+      - BACKUP_ENABLED=false
+    volumes:
+      - emas_data_dev:/app/data
+      - emas_logs_dev:/app/logs
+      - emas_backups_dev:/app/backups
+      # Montar código fuente para hot reload
+      - ../backend/src:/app/src:ro
+      - ../backend/config:/app/config:ro
+    networks:
+      - emas_network_dev
+    command: ["npm", "run", "dev"]
+
+  # Base de datos SQLite (desarrollo)
+  emas-db:
+    image: alpine:latest
+    container_name: emas-db-dev
+    restart: unless-stopped
+    volumes:
+      - emas_data_dev:/data
+    networks:
+      - emas_network_dev
+    command: >
+      sh -c "
+        apk add --no-cache sqlite &&
+        echo 'Base de datos SQLite de desarrollo inicializada' &&
+        tail -f /dev/null
+      "
+
+volumes:
+  emas_data_dev:
+    driver: local
+  emas_logs_dev:
+    driver: local
+  emas_backups_dev:
+    driver: local
+
+networks:
+  emas_network_dev:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16

@@ -1,0 +1,188 @@
+version: '3.8'
+
+services:
+  # Servicio principal de la aplicación
+  emas-app:
+    build:
+      context: ..
+      dockerfile: DevOps/Dockerfile
+    container_name: emas-weather-app
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - HOST=0.0.0.0
+      - DB_PATH=/app/data/weather.db
+      - DB_BACKUP_PATH=/app/backups/
+      - LOG_LEVEL=info
+      - WEATHER_STATIONS=${WEATHER_STATIONS:-192.168.1.100:80,192.168.1.101:80}
+      - STATION_POLLING_INTERVAL=${STATION_POLLING_INTERVAL:-30}
+      - STATION_REQUEST_TIMEOUT=${STATION_REQUEST_TIMEOUT:-5000}
+      - UDP_ENABLED=${UDP_ENABLED:-true}
+      - UDP_PORT=22222
+      - UDP_HOST=0.0.0.0
+      - UDP_BROADCAST_INTERVAL=${UDP_BROADCAST_INTERVAL:-2.5}
+      - WS_PATH=/ws/realtime
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://ema.chapelco.local}
+      - BACKUP_ENABLED=${BACKUP_ENABLED:-true}
+      - BACKUP_INTERVAL_HOURS=${BACKUP_INTERVAL_HOURS:-24}
+      - ALERT_CHECK_INTERVAL=${ALERT_CHECK_INTERVAL:-60}
+      - DATA_COLLECTION_INTERVAL=${DATA_COLLECTION_INTERVAL:-30}
+    volumes:
+      - emas_data:/app/data
+      - emas_logs:/app/logs
+      - emas_backups:/app/backups
+    networks:
+      - emas_network
+    depends_on:
+      - emas-db
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Base de datos SQLite (volumen persistente)
+  emas-db:
+    image: alpine:latest
+    container_name: emas-db
+    restart: unless-stopped
+    volumes:
+      - emas_data:/data
+    networks:
+      - emas_network
+    command: >
+      sh -c "
+        apk add --no-cache sqlite &&
+        echo 'Base de datos SQLite inicializada' &&
+        tail -f /dev/null
+      "
+
+  # Nginx como proxy reverso
+  nginx:
+    image: nginx:alpine
+    container_name: emas-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - emas_logs:/var/log/nginx
+    networks:
+      - emas_network
+    depends_on:
+      - emas-app
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis para cache y sesiones (opcional)
+  redis:
+    image: redis:7-alpine
+    container_name: emas-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - emas_redis:/data
+    networks:
+      - emas_network
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Prometheus para monitoreo
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: emas-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - emas_prometheus:/prometheus
+    networks:
+      - emas_network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+
+  # Grafana para visualización
+  grafana:
+    image: grafana/grafana:latest
+    container_name: emas-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - emas_grafana:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - emas_network
+    depends_on:
+      - prometheus
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backup automático
+  backup:
+    image: alpine:latest
+    container_name: emas-backup
+    restart: unless-stopped
+    volumes:
+      - emas_data:/data:ro
+      - emas_backups:/backups
+      - ./backup:/scripts:ro
+    networks:
+      - emas_network
+    command: >
+      sh -c "
+        apk add --no-cache sqlite3 &&
+        chmod +x /scripts/backup.sh &&
+        /scripts/backup.sh
+      "
+    depends_on:
+      - emas-app
+
+volumes:
+  emas_data:
+    driver: local
+  emas_logs:
+    driver: local
+  emas_backups:
+    driver: local
+  emas_redis:
+    driver: local
+  emas_prometheus:
+    driver: local
+  emas_grafana:
+    driver: local
+
+networks:
+  emas_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

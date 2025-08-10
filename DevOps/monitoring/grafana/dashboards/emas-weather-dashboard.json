@@ -1,0 +1,101 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "EMAS Weather Monitoring Dashboard",
+    "tags": ["weather", "monitoring", "emas"],
+    "style": "dark",
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "System Health",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=\"emas-weather-app\"}",
+            "legendFormat": "App Status"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "HTTP Requests",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total{job=\"emas-weather-app\"}[5m])",
+            "legendFormat": "Requests/sec"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 6, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Memory Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "process_resident_memory_bytes{job=\"emas-weather-app\"} / 1024 / 1024",
+            "legendFormat": "Memory (MB)"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 18, "y": 0}
+      },
+      {
+        "id": 4,
+        "title": "Database Connections",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "database_connections_active{job=\"emas-weather-app\"}",
+            "legendFormat": "Active Connections"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 8}
+      },
+      {
+        "id": 5,
+        "title": "Weather Data Points",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(weather_data_points_total{job=\"emas-weather-app\"}[5m])",
+            "legendFormat": "Data Points/sec"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 6, "y": 8}
+      },
+      {
+        "id": 6,
+        "title": "Station Connectivity",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "weather_station_status{job=\"emas-weather-app\"}",
+            "legendFormat": "Station Status"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 18, "y": 8}
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "30s"
+  }
+}
