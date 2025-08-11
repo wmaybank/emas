@@ -1,0 +1,78 @@
+# Multi-stage Dockerfile para EMAS - Frontend + Backend
+FROM node:18-alpine as frontend-builder
+
+# Construir frontend
+WORKDIR /frontend
+COPY frontend/package*.json ./
+RUN npm ci
+
+# Copiar archivos del frontend
+COPY frontend/ ./
+
+# Configurar variables de entorno para build de producción
+ENV NODE_ENV=production
+ENV REACT_APP_API_URL=/api
+ENV REACT_APP_WS_URL=ws://localhost/ws
+ENV GENERATE_SOURCEMAP=false
+
+# Construir frontend para producción
+RUN npm run build
+
+# Imagen final con backend y frontend
+FROM node:18-alpine
+
+# Instalar dependencias del sistema
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    sqlite \
+    nginx \
+    && rm -rf /var/cache/apk/*
+
+# Crear directorio de trabajo
+WORKDIR /app
+
+# Copiar package.json y package-lock.json del backend
+COPY backend/package*.json ./
+
+# Instalar dependencias del backend
+RUN npm ci --only=production && npm cache clean --force
+
+# Copiar código fuente del backend
+COPY backend/src ./src
+COPY backend/config ./config
+COPY backend/scripts ./scripts
+
+# Copiar archivos construidos del frontend
+COPY --from=frontend-builder /frontend/build /var/www/html
+
+# Crear directorios necesarios
+RUN mkdir -p data logs backups /etc/nginx/conf.d
+
+# Copiar configuración de nginx
+COPY DevOps/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY DevOps/nginx/conf.d/emas-fullstack.conf /etc/nginx/conf.d/default.conf
+
+# Crear usuario no-root para seguridad
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
+# Cambiar permisos
+RUN chown -R nodejs:nodejs /app
+RUN chown -R nginx:nginx /var/www/html
+RUN chown -R nginx:nginx /var/log/nginx
+
+# Exponer puertos
+EXPOSE 80 3001
+
+# Script de inicio
+COPY DevOps/start-services.sh /start-services.sh
+RUN chmod +x /start-services.sh
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+    CMD wget --quiet --tries=1 --spider http://localhost/api/health || exit 1
+
+# Comando de inicio
+CMD ["/start-services.sh"]

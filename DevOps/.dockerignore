@@ -58,9 +58,9 @@ __tests__
 *.test.js
 *.spec.js
 
-# Archivos de build
+# Archivos de build backend
 dist
-build
+# No excluir build del frontend ya que se genera durante el build
 
 # Archivos temporales
 tmp
