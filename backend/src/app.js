@@ -11,7 +11,7 @@ const logger = require('./utils/logger');
 // Importar servicios
 const LocalWeatherStationService = require('./services/localWeatherStationService');
 const DatabaseService = require('./services/databaseService');
-const WebSocketService = require('./services/websocketService');
+const wsService = require('./services/websocket');
 
 // Importar controladores
 const stationsController = require('./controllers/stationsController');
@@ -53,7 +53,6 @@ app.use((req, res, next) => {
 // Inicializar servicios
 const dbService = new DatabaseService();
 const localWeatherService = new LocalWeatherStationService();
-const wsService = new WebSocketService();
 
 // Configurar rutas de la API
 app.use('/api/stations', stationsController);
@@ -131,9 +130,9 @@ async function initializeServices() {
       }
     });
 
-    // Iniciar WebSocket
-    wsService.start();
-    logger.info('✅ Servicio WebSocket iniciado');
+    // Iniciar WebSocket (se iniciará más tarde con attachToServer)
+    // wsService.start();
+    logger.info('✅ Servicio WebSocket preparado');
 
     logger.info('🎉 Todos los servicios inicializados correctamente');
 
