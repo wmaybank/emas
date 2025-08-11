@@ -76,7 +76,7 @@ chmod +x deploy.sh
 
 ```bash
 # Estaciones meteorológicas locales
-WEATHER_STATIONS=192.168.1.100:80,192.168.1.101:80
+WEATHER_STATIONS=10.20.50.50:80,10.20.50.51:80,10.20.50.52:80
 
 # Configuración de polling
 STATION_POLLING_INTERVAL=30

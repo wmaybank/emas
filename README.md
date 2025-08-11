@@ -72,7 +72,7 @@ nano backend/.env
 #### Configuración de Estaciones
 ```bash
 # Lista de IPs de estaciones en la red local
-WEATHER_STATIONS=192.168.1.100:80,192.168.1.101:80,192.168.1.102:80
+WEATHER_STATIONS=10.20.50.50:80,10.20.50.51:80,10.20.50.52:80
 
 # Intervalo de polling HTTP (segundos)
 STATION_POLLING_INTERVAL=30
@@ -109,7 +109,7 @@ HOST=localhost
 #### Estaciones Locales
 ```bash
 # Lista de IPs separadas por comas
-WEATHER_STATIONS=192.168.1.100:80,192.168.1.101:80
+WEATHER_STATIONS=10.20.50.50:80,10.20.50.51:80,10.20.50.52:80
 
 # Configuración de polling
 STATION_POLLING_INTERVAL=30

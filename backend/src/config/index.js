@@ -29,8 +29,9 @@ const config = {
           baseUrl: `http://${ip.trim()}:${parseInt(port) || 80}`
         };
       }) : [
-        { ip: '192.168.1.100', port: 80, baseUrl: 'http://192.168.1.100:80' },
-        { ip: '192.168.1.101', port: 80, baseUrl: 'http://192.168.1.101:80' }
+        { ip: '10.20.50.50', port: 80, baseUrl: 'http://10.20.50.50:80' },
+        { ip: '10.20.50.51', port: 80, baseUrl: 'http://10.20.50.51:80' },
+        { ip: '10.20.50.52', port: 80, baseUrl: 'http://10.20.50.52:80' }
       ],
     pollingInterval: parseInt(process.env.STATION_POLLING_INTERVAL) || 30,
     requestTimeout: parseInt(process.env.STATION_REQUEST_TIMEOUT) || 5000
