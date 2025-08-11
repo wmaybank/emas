@@ -11,8 +11,9 @@ Este directorio contiene toda la configuración necesaria para desplegar el sist
 - **nginx**: Proxy reverso con SSL
 - **redis**: Cache y sesiones
 - **prometheus**: Monitoreo y métricas
-- **grafana**: Visualización de datos
 - **backup**: Backup automático de la base de datos
+
+> **Nota**: Grafana se ha removido del stack Docker. Se asume que tienes un servidor Grafana existente en tu red. Ver `monitoring/grafana/EXTERNAL_SETUP.md` para instrucciones de configuración.
 
 ### Redes y Volúmenes
 
@@ -94,9 +95,10 @@ GRAFANA_PASSWORD=tu_password_aqui
 
 - **80/443**: Nginx (HTTP/HTTPS)
 - **3001**: Aplicación EMAS
-- **3000**: Grafana
 - **9090**: Prometheus
 - **6379**: Redis
+
+> **Nota**: El puerto 3000 ya no está en uso por Grafana local. Configura tu servidor Grafana existente para conectarse a Prometheus en el puerto 9090.
 
 ## 📊 Monitoreo
 
@@ -106,12 +108,11 @@ GRAFANA_PASSWORD=tu_password_aqui
 - **Métricas**: Aplicación, Nginx, Redis, Sistema
 - **Retención**: 200 horas por defecto
 
-### Grafana
+### Grafana Externo
 
-- **URL**: http://localhost:3000
-- **Usuario**: admin
-- **Contraseña**: Definida en `GRAFANA_PASSWORD`
-- **Dashboards**: Pre-configurados para EMAS
+- **Configuración**: Ver `monitoring/grafana/EXTERNAL_SETUP.md`
+- **Dashboard**: Importar `monitoring/grafana/dashboards/emas-weather-dashboard.json`
+- **Datasource**: Conectar a Prometheus en `http://[IP_SERVIDOR]:9090`
 
 ## 🔒 Seguridad
 

@@ -99,30 +99,6 @@ services:
       - '--storage.tsdb.retention.time=200h'
       - '--web.enable-lifecycle'
 
-  # Grafana para visualización
-  grafana:
-    image: grafana/grafana:latest
-    container_name: emas-grafana
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
-      - GF_USERS_ALLOW_SIGN_UP=false
-    volumes:
-      - emas_grafana:/var/lib/grafana
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
-      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
-    networks:
-      - emas_network
-    depends_on:
-      - prometheus
-    healthcheck:
-      test: ["CMD-SHELL", "wget --quiet --tries=1 --spider http://localhost:3000/api/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
   # Backup automático
   backup:
     image: alpine:latest
@@ -153,8 +129,6 @@ volumes:
   emas_redis:
     driver: local
   emas_prometheus:
-    driver: local
-  emas_grafana:
     driver: local
   nginx_logs:
     driver: local
