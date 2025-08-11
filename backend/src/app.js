@@ -176,9 +176,13 @@ function setupCronJobs() {
       // Obtener datos actuales de todas las estaciones
       const currentData = await localWeatherService.getAllStationsData();
       
-      // Verificar alertas para cada estación
-      for (const stationData of currentData) {
-        await dbService.checkAlerts(stationData);
+      // Verificar alertas para cada estación (solo si hay datos)
+      if (currentData && Array.isArray(currentData)) {
+        for (const stationData of currentData) {
+          if (stationData) {
+            await dbService.checkAlerts(stationData);
+          }
+        }
       }
       
     } catch (error) {

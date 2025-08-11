@@ -74,8 +74,11 @@ class LocalWeatherStationService {
         this.notifyDataCallbacks(validResults);
         logger.debug(`Datos obtenidos de ${validResults.length}/${this.stations.length} estaciones`);
       }
+      
+      return validResults; // Devolver los resultados válidos
     } catch (error) {
       logger.error('Error en polling de estaciones:', error);
+      return []; // Devolver array vacío en caso de error
     }
   }
 
@@ -441,28 +444,43 @@ class LocalWeatherStationService {
 
         // Datos de viento
         if (sensor.wind) {
-          reading.wind_speed_last = sensor.wind.speed.last;
-          reading.wind_speed_avg_1min = sensor.wind.speed.avg1min;
-          reading.wind_speed_avg_2min = sensor.wind.speed.avg2min;
-          reading.wind_speed_avg_10min = sensor.wind.speed.avg10min;
-          reading.wind_speed_hi_2min = sensor.wind.speed.hi2min;
-          reading.wind_speed_hi_10min = sensor.wind.speed.hi10min;
+          // Velocidades de viento
+          if (sensor.wind.speed) {
+            reading.wind_speed_last = sensor.wind.speed.last;
+            reading.wind_speed_avg_1min = sensor.wind.speed.avg1min;
+            reading.wind_speed_avg_2min = sensor.wind.speed.avg2min;
+            reading.wind_speed_avg_10min = sensor.wind.speed.avg10min;
+            reading.wind_speed_hi_2min = sensor.wind.speed.hi2min;
+            reading.wind_speed_hi_10min = sensor.wind.speed.hi10min;
+          }
           
-          reading.wind_dir_last = sensor.wind.direction.last;
-          reading.wind_dir_avg_1min = sensor.wind.direction.avg1min;
-          reading.wind_dir_avg_2min = sensor.wind.direction.avg2min;
-          reading.wind_dir_avg_10min = sensor.wind.direction.avg10min;
-          reading.wind_dir_at_hi_speed_2min = sensor.wind.direction.atHiSpeed2min;
-          reading.wind_dir_at_hi_speed_10min = sensor.wind.direction.atHiSpeed10min;
+          // Direcciones de viento
+          if (sensor.wind.direction) {
+            reading.wind_dir_last = sensor.wind.direction.last;
+            reading.wind_dir_avg_1min = sensor.wind.direction.avg1min;
+            reading.wind_dir_avg_2min = sensor.wind.direction.avg2min;
+            reading.wind_dir_avg_10min = sensor.wind.direction.avg10min;
+            reading.wind_dir_at_hi_speed_2min = sensor.wind.direction.atHiSpeed2min;
+            reading.wind_dir_at_hi_speed_10min = sensor.wind.direction.atHiSpeed10min;
+          }
         }
 
         // Datos de lluvia
         if (sensor.rain) {
-          reading.rain_rate_last = sensor.rain.rate.last;
-          reading.rain_rate_hi = sensor.rain.rate.hi;
-          reading.rainfall_15min = sensor.rain.storm.last15min;
-          reading.rainfall_60min = sensor.rain.storm.last60min;
-          reading.rainfall_24hr = sensor.rain.storm.last24hr;
+          // Tasa de lluvia
+          if (sensor.rain.rate) {
+            reading.rain_rate_last = sensor.rain.rate.last;
+            reading.rain_rate_hi = sensor.rain.rate.hi;
+          }
+          
+          // Datos de tormenta
+          if (sensor.rain.storm) {
+            reading.rainfall_15min = sensor.rain.storm.last15min;
+            reading.rainfall_60min = sensor.rain.storm.last60min;
+            reading.rainfall_24hr = sensor.rain.storm.last24hr;
+          }
+          
+          // Acumulados
           reading.rainfall_daily = sensor.rain.daily;
           reading.rainfall_monthly = sensor.rain.monthly;
           reading.rainfall_year = sensor.rain.yearly;
