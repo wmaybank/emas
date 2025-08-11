@@ -28,16 +28,17 @@ RUN apk add --no-cache \
     g++ \
     sqlite \
     nginx \
+    wget \
     && rm -rf /var/cache/apk/*
 
 # Crear directorio de trabajo
 WORKDIR /app
 
-# Copiar package.json del proyecto raíz (si existe) o crear uno básico
+# Copiar package.json del proyecto raíz
 COPY package*.json ./
 
-# Instalar dependencias del backend
-RUN npm ci --only=production && npm cache clean --force
+# Instalar dependencias del backend (solo producción)
+RUN npm install --only=production && npm cache clean --force
 
 # Copiar código fuente del backend
 COPY backend/src ./src
