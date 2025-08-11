@@ -102,6 +102,36 @@ app.get('/', (req, res) => {
 app.ws = wsService;
 
 // Inicializar base de datos y servicios
+// Función para inicializar estaciones en la base de datos
+async function initializeStations() {
+  try {
+    for (const station of config.weatherStations.stations) {
+      const stationData = {
+        id: station.ip, // Usar IP como ID único
+        name: `Estación ${station.ip}`,
+        ip: station.ip,
+        location: `Estación meteorológica en ${station.ip}`,
+        altitude: null,
+        latitude: null,
+        longitude: null,
+        active: true
+      };
+      
+      // Verificar si la estación ya existe
+      const existingStation = await dbService.getStation(stationData.id);
+      if (!existingStation) {
+        await dbService.createStation(stationData);
+        logger.info(`✅ Estación creada: ${stationData.id} (${stationData.name})`);
+      } else {
+        logger.info(`ℹ️ Estación ya existe: ${stationData.id}`);
+      }
+    }
+  } catch (error) {
+    logger.error('Error inicializando estaciones:', error);
+    throw error;
+  }
+}
+
 async function initializeServices() {
   try {
     logger.info('Inicializando servicios...');
@@ -109,6 +139,10 @@ async function initializeServices() {
     // Inicializar base de datos
     await dbService.initialize();
     logger.info('✅ Base de datos inicializada');
+
+    // Inicializar estaciones en la base de datos
+    await initializeStations();
+    logger.info('✅ Estaciones inicializadas en la base de datos');
 
     // Iniciar servicio de estaciones locales
     localWeatherService.startPolling();
