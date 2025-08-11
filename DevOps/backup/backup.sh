@@ -29,7 +29,7 @@ fi
 
 # Crear backup de la base de datos
 echo "📊 Creando backup de la base de datos..."
-sqlite3 "$DATA_DIR/$DB_NAME" ".dump" > "$BACKUP_DIR/$BACKUP_FILE"
+sqlite "$DATA_DIR/$DB_NAME" ".dump" > "$BACKUP_DIR/$BACKUP_FILE"
 
 if [ $? -eq 0 ]; then
     echo "✅ Backup creado exitosamente: $BACKUP_FILE"

@@ -2,11 +2,11 @@
 FROM node:18-alpine
 
 # Instalar dependencias del sistema
-RUN apk add --no-cache \
+RUN apk update && apk add --no-cache \
     python3 \
     make \
     g++ \
-    sqlite \
+    sqlite-dev \
     && rm -rf /var/cache/apk/*
 
 # Crear directorio de trabajo

@@ -225,7 +225,7 @@ manual_backup() {
         -v "$(pwd)/backup:/scripts:ro" \
         alpine:latest \
         sh -c "
-            apk add --no-cache sqlite3 gzip &&
+            apk add --no-cache sqlite gzip &&
             chmod +x /scripts/backup.sh &&
             /scripts/backup.sh
         "
