@@ -222,6 +222,11 @@ class DatabaseService {
     return await this.run(sql, params);
   }
 
+  // Método alias para compatibilidad
+  async saveWeatherData(stationData) {
+    return await this.insertWeatherReading(stationData);
+  }
+
   async getWeatherReadings(stationId, limit = 100, offset = 0) {
     const sql = `
       SELECT * FROM weather_readings 
@@ -486,6 +491,28 @@ class DatabaseService {
     }
     
     return info;
+  }
+
+  // Verificar alertas meteorológicas (método placeholder)
+  async checkAlerts(stationData) {
+    // Por ahora retornamos un placeholder
+    // TODO: Implementar lógica de alertas
+    return {
+      station_id: stationData.station_id || 'unknown',
+      alerts: [],
+      checked_at: new Date().toISOString()
+    };
+  }
+
+  // Crear respaldo de base de datos (método placeholder)
+  async createBackup() {
+    // Por ahora retornamos un placeholder
+    // TODO: Implementar lógica de respaldo
+    return {
+      status: 'backup_placeholder',
+      message: 'Método de respaldo pendiente de implementación',
+      timestamp: new Date().toISOString()
+    };
   }
 
   // Cerrar conexión

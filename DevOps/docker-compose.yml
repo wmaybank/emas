@@ -8,28 +8,30 @@ services:
       dockerfile: DevOps/Dockerfile
     container_name: emas-weather-app
     restart: unless-stopped
+    env_file:
+      - .env
     ports:
       - "3001:3001"
     environment:
-      - NODE_ENV=production
-      - PORT=3001
-      - HOST=0.0.0.0
-      - DB_PATH=/app/data/weather.db
-      - DB_BACKUP_PATH=/app/backups/
-      - LOG_LEVEL=info
-      - WEATHER_STATIONS=${WEATHER_STATIONS:-192.168.1.100:80,192.168.1.101:80}
-      - STATION_POLLING_INTERVAL=${STATION_POLLING_INTERVAL:-30}
-      - STATION_REQUEST_TIMEOUT=${STATION_REQUEST_TIMEOUT:-5000}
-      - UDP_ENABLED=${UDP_ENABLED:-true}
-      - UDP_PORT=22222
-      - UDP_HOST=0.0.0.0
-      - UDP_BROADCAST_INTERVAL=${UDP_BROADCAST_INTERVAL:-2.5}
-      - WS_PATH=/ws/realtime
-      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://ema.chapelco.local}
-      - BACKUP_ENABLED=${BACKUP_ENABLED:-true}
-      - BACKUP_INTERVAL_HOURS=${BACKUP_INTERVAL_HOURS:-24}
-      - ALERT_CHECK_INTERVAL=${ALERT_CHECK_INTERVAL:-60}
-      - DATA_COLLECTION_INTERVAL=${DATA_COLLECTION_INTERVAL:-30}
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${PORT}
+      - HOST=${HOST}
+      - DB_PATH=${DB_PATH}
+      - DB_BACKUP_PATH=${DB_BACKUP_PATH}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - WEATHER_STATIONS=${WEATHER_STATIONS}
+      - STATION_POLLING_INTERVAL=${STATION_POLLING_INTERVAL}
+      - STATION_REQUEST_TIMEOUT=${STATION_REQUEST_TIMEOUT}
+      - UDP_ENABLED=${UDP_ENABLED}
+      - UDP_PORT=${UDP_PORT}
+      - UDP_HOST=${UDP_HOST}
+      - UDP_BROADCAST_INTERVAL=${UDP_BROADCAST_INTERVAL}
+      - WS_PATH=${WS_PATH}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      - BACKUP_ENABLED=${BACKUP_ENABLED}
+      - BACKUP_INTERVAL_HOURS=${BACKUP_INTERVAL_HOURS}
+      - ALERT_CHECK_INTERVAL=${ALERT_CHECK_INTERVAL}
+      - DATA_COLLECTION_INTERVAL=${DATA_COLLECTION_INTERVAL}
     volumes:
       - emas_data:/app/data
       - emas_logs:/app/logs

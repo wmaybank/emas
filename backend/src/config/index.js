@@ -1,6 +1,11 @@
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 
+// Debug temporal - verificar si se está leyendo el .env
+console.log('🔍 Debug .env path:', path.join(__dirname, '../../.env'));
+console.log('🔍 WEATHER_STATIONS from env:', process.env.WEATHER_STATIONS);
+console.log('🔍 Current working directory:', process.cwd());
+
 const config = {
   server: {
     env: process.env.NODE_ENV || 'development',

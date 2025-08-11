@@ -54,6 +54,11 @@ app.use((req, res, next) => {
 const dbService = new DatabaseService();
 const localWeatherService = new LocalWeatherStationService();
 
+// Hacer servicios disponibles para los controladores
+app.locals.dbService = dbService;
+app.locals.localWeatherService = localWeatherService;
+app.locals.weatherManager = localWeatherService; // Alias para compatibilidad con controladores
+
 // Configurar rutas de la API
 app.use('/api/stations', stationsController);
 app.use('/api/data', dataController);
