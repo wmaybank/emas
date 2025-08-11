@@ -8,7 +8,6 @@ class WebSocketService {
         this.isRunning = false;
     }
 
-    // MÉTODO START CRÍTICO - ESTE ES EL QUE FALTA
     start(server) {
         try {
             if (this.isRunning) {
@@ -16,25 +15,21 @@ class WebSocketService {
                 return;
             }
 
-            // Crear WebSocket Server
-            this.wss = new WebSocket.Server({ 
+            this.wss = new WebSocket.Server({
                 server,
                 path: '/ws/realtime'
             });
 
-            // Manejar nuevas conexiones
-            this.wss.on('connection', (ws, request) => {
+            this.wss.on('connection', (ws) => {
                 this.clients.add(ws);
-                logger.info(`✅ Cliente WebSocket conectado. Total clientes: ${this.clients.size}`);
+                logger.info(`Cliente WebSocket conectado. Total: ${this.clients.size}`);
 
-                // Mensaje de bienvenida
                 ws.send(JSON.stringify({
                     type: 'connection',
                     message: 'Conectado al sistema EMAS',
                     timestamp: new Date().toISOString()
                 }));
 
-                // Manejar mensajes entrantes
                 ws.on('message', (message) => {
                     try {
                         const data = JSON.parse(message);
@@ -44,13 +39,11 @@ class WebSocketService {
                     }
                 });
 
-                // Manejar desconexión
                 ws.on('close', () => {
                     this.clients.delete(ws);
-                    logger.info(`Cliente WebSocket desconectado. Total clientes: ${this.clients.size}`);
+                    logger.info(`Cliente WebSocket desconectado. Total: ${this.clients.size}`);
                 });
 
-                // Manejar errores
                 ws.on('error', (error) => {
                     logger.error('Error en conexión WebSocket:', error);
                     this.clients.delete(ws);
@@ -58,110 +51,71 @@ class WebSocketService {
             });
 
             this.isRunning = true;
-            logger.info('🚀 Servicio WebSocket iniciado correctamente en /ws/realtime');
-            
+            logger.info('✅ Servicio WebSocket iniciado en /ws/realtime');
         } catch (error) {
-            logger.error('❌ Error crítico al iniciar WebSocket service:', error);
+            logger.error('❌ Error al iniciar WebSocket service:', error);
             throw error;
         }
     }
 
-    // Manejar mensajes de clientes
     handleMessage(ws, data) {
-        try {
-            switch (data.type) {
-                case 'ping':
-                    ws.send(JSON.stringify({ 
-                        type: 'pong', 
-                        timestamp: new Date().toISOString() 
-                    }));
-                    break;
-                
-                case 'subscribe':
-                    ws.send(JSON.stringify({ 
-                        type: 'subscribed', 
-                        channel: data.channel,
-                        timestamp: new Date().toISOString() 
-                    }));
-                    logger.info(`Cliente suscrito a canal: ${data.channel}`);
-                    break;
-                
-                default:
-                    logger.warn('Tipo de mensaje WebSocket desconocido:', data.type);
-            }
-        } catch (error) {
-            logger.error('Error manejando mensaje WebSocket:', error);
+        switch (data.type) {
+            case 'ping':
+                ws.send(JSON.stringify({ type: 'pong', timestamp: new Date().toISOString() }));
+                break;
+            case 'subscribe':
+                ws.send(JSON.stringify({
+                    type: 'subscribed',
+                    channel: data.channel,
+                    timestamp: new Date().toISOString()
+                }));
+                break;
+            default:
+                logger.warn('Tipo de mensaje WebSocket desconocido:', data.type);
         }
     }
 
-    // Broadcast a todos los clientes
-    broadcast(data) {
-        if (!this.isRunning || this.clients.size === 0) {
-            return;
-        }
+    broadcast(payload) {
+        if (!this.isRunning || this.clients.size === 0) return;
+        const message = JSON.stringify({ ...payload, timestamp: new Date().toISOString() });
 
-        const message = JSON.stringify({
-            ...data,
-            timestamp: new Date().toISOString()
-        });
-
-        let successCount = 0;
         this.clients.forEach(client => {
             if (client.readyState === WebSocket.OPEN) {
-                try {
-                    client.send(message);
-                    successCount++;
-                } catch (error) {
-                    logger.error('Error enviando mensaje a cliente:', error);
+                try { client.send(message); }
+                catch (err) {
+                    logger.error('Error enviando mensaje a cliente:', err);
                     this.clients.delete(client);
                 }
             } else {
                 this.clients.delete(client);
             }
         });
-
-        logger.debug(`Mensaje broadcast enviado a ${successCount} clientes`);
     }
 
-    // Enviar datos meteorológicos
     broadcastWeatherData(weatherData) {
-        this.broadcast({
-            type: 'weather_update',
-            data: weatherData
-        });
-        logger.info('Datos meteorológicos enviados via WebSocket');
+        this.broadcast({ type: 'weather_update', data: weatherData });
     }
 
-    // Enviar alertas
     broadcastAlert(alert) {
-        this.broadcast({
-            type: 'alert',
-            data: alert,
-            priority: 'high'
-        });
-        logger.warn('Alerta enviada via WebSocket:', alert.message);
+        this.broadcast({ type: 'alert', data: alert, priority: 'high' });
     }
 
-    // Detener servicio
     stop() {
         try {
             if (this.wss) {
                 this.clients.forEach(client => {
-                    if (client.readyState === WebSocket.OPEN) {
-                        client.close(1000, 'Servidor cerrando');
-                    }
+                    if (client.readyState === WebSocket.OPEN) client.close(1000, 'Servidor cerrando');
                 });
                 this.clients.clear();
                 this.wss.close();
                 this.isRunning = false;
-                logger.info('🛑 Servicio WebSocket detenido correctamente');
+                logger.info('🛑 Servicio WebSocket detenido');
             }
         } catch (error) {
             logger.error('Error deteniendo WebSocket service:', error);
         }
     }
 
-    // Estado del servicio
     get status() {
         return {
             running: this.isRunning,
@@ -171,5 +125,23 @@ class WebSocketService {
     }
 }
 
-// Exportar instancia singleton
-module.exports = new WebSocketService();
+// Exportación tolerante a distintos estilos de import
+const service = new WebSocketService();
+
+// Soporta: const wsService = require(...); wsService.start()
+service.start = service.start.bind(service);
+service.broadcast = service.broadcast.bind(service);
+service.broadcastWeatherData = service.broadcastWeatherData.bind(service);
+service.broadcastAlert = service.broadcastAlert.bind(service);
+service.stop = service.stop.bind(service);
+
+// Soporta: const { start } = require(...); start()
+module.exports = {
+    service,
+    start: (...args) => service.start(...args),
+    broadcast: (...args) => service.broadcast(...args),
+    broadcastWeatherData: (...args) => service.broadcastWeatherData(...args),
+    broadcastAlert: (...args) => service.broadcastAlert(...args),
+    stop: (...args) => service.stop(...args),
+    get status() { return service.status; }
+};
