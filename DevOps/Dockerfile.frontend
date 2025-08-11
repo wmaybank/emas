@@ -33,16 +33,14 @@ RUN apk add --no-cache \
 # Crear directorio de trabajo
 WORKDIR /app
 
-# Copiar package.json y package-lock.json del backend
-COPY backend/package*.json ./
+# Copiar package.json del proyecto raíz (si existe) o crear uno básico
+COPY package*.json ./
 
 # Instalar dependencias del backend
 RUN npm ci --only=production && npm cache clean --force
 
 # Copiar código fuente del backend
 COPY backend/src ./src
-COPY backend/config ./config
-COPY backend/scripts ./scripts
 
 # Copiar archivos construidos del frontend
 COPY --from=frontend-builder /frontend/build /var/www/html
