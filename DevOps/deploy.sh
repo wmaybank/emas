@@ -17,6 +17,13 @@ COMPOSE_FILE="docker-compose.yml"
 COMPOSE_DEV_FILE="docker-compose.dev.yml"
 ENV_FILE="env.docker"
 
+# Detectar comando de Docker Compose
+if docker compose version &> /dev/null; then
+    DOCKER_COMPOSE_CMD="docker compose"
+else
+    DOCKER_COMPOSE_CMD="docker-compose"
+fi
+
 # Función para mostrar ayuda
 show_help() {
     echo -e "${BLUE}EMAS Weather Monitoring System - Script de Despliegue${NC}"
@@ -52,7 +59,7 @@ check_requirements() {
     fi
     
     # Verificar Docker Compose
-    if ! command -v docker-compose &> /dev/null; then
+    if ! docker compose version &> /dev/null && ! command -v docker-compose &> /dev/null; then
         echo -e "${RED}❌ Docker Compose no está instalado${NC}"
         exit 1
     fi
@@ -80,10 +87,10 @@ deploy_production() {
     
     # Construir y levantar servicios
     echo -e "${BLUE}🔨 Construyendo imagen de la aplicación...${NC}"
-    docker-compose -f "$COMPOSE_FILE" build emas-app
+    $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" build emas-app
     
     echo -e "${BLUE}📦 Levantando todos los servicios...${NC}"
-    docker-compose -f "$COMPOSE_FILE" up -d
+    $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" up -d
     
     echo -e "${GREEN}✅ Despliegue en producción completado${NC}"
     echo -e "${BLUE}🌐 Servicios disponibles:${NC}"
@@ -100,10 +107,10 @@ deploy_development() {
     
     # Construir y levantar servicios de desarrollo
     echo -e "${BLUE}🔨 Construyendo imagen de la aplicación...${NC}"
-    docker-compose -f "$COMPOSE_DEV_FILE" build emas-app
+    $DOCKER_COMPOSE_CMD -f "$COMPOSE_DEV_FILE" build emas-app
     
     echo -e "${BLUE}📦 Levantando servicios de desarrollo...${NC}"
-    docker-compose -f "$COMPOSE_DEV_FILE" up -d
+    $DOCKER_COMPOSE_CMD -f "$COMPOSE_DEV_FILE" up -d
     
     echo -e "${GREEN}✅ Despliegue en desarrollo completado${NC}"
     echo -e "${BLUE}🌐 Servicios disponibles:${NC}"
@@ -117,12 +124,12 @@ stop_services() {
     
     # Detener servicios de producción
     if [ -f "$COMPOSE_FILE" ]; then
-        docker-compose -f "$COMPOSE_FILE" down
+        $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" down
     fi
     
     # Detener servicios de desarrollo
     if [ -f "$COMPOSE_DEV_FILE" ]; then
-        docker-compose -f "$COMPOSE_DEV_FILE" down
+        $DOCKER_COMPOSE_CMD -f "$COMPOSE_DEV_FILE" down
     fi
     
     echo -e "${GREEN}✅ Servicios detenidos${NC}"
@@ -133,12 +140,12 @@ restart_services() {
     echo -e "${YELLOW}🔄 Reiniciando servicios...${NC}"
     
     # Determinar qué archivo usar
-    if docker-compose -f "$COMPOSE_FILE" ps | grep -q "Up"; then
+    if $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" ps | grep -q "Up"; then
         echo -e "${BLUE}🔄 Reiniciando servicios de producción...${NC}"
-        docker-compose -f "$COMPOSE_FILE" restart
-    elif docker-compose -f "$COMPOSE_DEV_FILE" ps | grep -q "Up"; then
+        $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" restart
+    elif $DOCKER_COMPOSE_CMD -f "$COMPOSE_DEV_FILE" ps | grep -q "Up"; then
         echo -e "${BLUE}🔄 Reiniciando servicios de desarrollo...${NC}"
-        docker-compose -f "$COMPOSE_DEV_FILE" restart
+        $DOCKER_COMPOSE_CMD -f "$COMPOSE_DEV_FILE" restart
     else
         echo -e "${YELLOW}⚠️  No hay servicios ejecutándose${NC}"
     fi
@@ -151,10 +158,10 @@ show_logs() {
     echo -e "${BLUE}📋 Mostrando logs de los servicios...${NC}"
     
     # Determinar qué archivo usar
-    if docker-compose -f "$COMPOSE_FILE" ps | grep -q "Up"; then
-        docker-compose -f "$COMPOSE_FILE" logs -f
-    elif docker-compose -f "$COMPOSE_DEV_FILE" ps | grep -q "Up"; then
-        docker-compose -f "$COMPOSE_DEV_FILE" logs -f
+    if $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" ps | grep -q "Up"; then
+        $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" logs -f
+    elif $DOCKER_COMPOSE_CMD -f "$COMPOSE_DEV_FILE" ps | grep -q "Up"; then
+        $DOCKER_COMPOSE_CMD -f "$COMPOSE_DEV_FILE" logs -f
     else
         echo -e "${YELLOW}⚠️  No hay servicios ejecutándose${NC}"
     fi
@@ -167,7 +174,7 @@ show_status() {
     # Verificar servicios de producción
     if [ -f "$COMPOSE_FILE" ]; then
         echo -e "${BLUE}🏭 Servicios de Producción:${NC}"
-        docker-compose -f "$COMPOSE_FILE" ps
+        $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" ps
     fi
     
     echo ""
@@ -175,7 +182,7 @@ show_status() {
     # Verificar servicios de desarrollo
     if [ -f "$COMPOSE_DEV_FILE" ]; then
         echo -e "${BLUE}🔧 Servicios de Desarrollo:${NC}"
-        docker-compose -f "$COMPOSE_DEV_FILE" ps
+        $DOCKER_COMPOSE_CMD -f "$COMPOSE_DEV_FILE" ps
     fi
     
     echo ""
@@ -188,8 +195,8 @@ clean_all() {
     echo -e "${YELLOW}🧹 Limpiando contenedores, volúmenes y redes...${NC}"
     
     # Detener y eliminar contenedores
-    docker-compose -f "$COMPOSE_FILE" down -v --remove-orphans 2>/dev/null || true
-    docker-compose -f "$COMPOSE_DEV_FILE" down -v --remove-orphans 2>/dev/null || true
+    $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" down -v --remove-orphans 2>/dev/null || true
+    $DOCKER_COMPOSE_CMD -f "$COMPOSE_DEV_FILE" down -v --remove-orphans 2>/dev/null || true
     
     # Eliminar contenedores huérfanos
     docker container prune -f

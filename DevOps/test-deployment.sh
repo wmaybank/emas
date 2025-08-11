@@ -15,6 +15,13 @@ NC='\033[0m'
 BASE_URL="http://localhost"
 API_URL="$BASE_URL/api"
 
+# Detectar comando de Docker Compose
+if docker compose version &> /dev/null; then
+    DOCKER_COMPOSE_CMD="docker compose"
+else
+    DOCKER_COMPOSE_CMD="docker-compose"
+fi
+
 log() {
     echo -e "${BLUE}[TEST]${NC} $1"
 }
@@ -239,7 +246,7 @@ main() {
         error "$FAILED_TESTS critical test(s) failed! ❌"
         echo ""
         echo "Check the logs with:"
-        echo "docker-compose -f DevOps/docker-compose.fullstack.yml logs -f"
+        echo "$DOCKER_COMPOSE_CMD -f DevOps/docker-compose.fullstack.yml logs -f"
         exit 1
     fi
     

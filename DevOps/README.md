@@ -28,7 +28,7 @@ Este directorio contiene toda la configuración necesaria para desplegar el sist
 ```bash
 # Verificar Docker
 docker --version
-docker-compose --version
+docker compose version
 
 # Verificar que Docker esté ejecutándose
 docker info
@@ -171,8 +171,8 @@ docker exec -it emas-weather-app sh -c "
 ./deploy.sh logs
 
 # Logs de un servicio específico
-docker-compose logs -f emas-app
-docker-compose logs -f nginx
+docker compose logs -f emas-app
+docker compose logs -f nginx
 ```
 
 ### Verificar Estado
@@ -192,7 +192,7 @@ docker ps
 ./deploy.sh restart
 
 # Reiniciar un servicio específico
-docker-compose restart emas-app
+docker compose restart emas-app
 ```
 
 ### Problemas Comunes
@@ -235,7 +235,7 @@ docker exec emas-app ping nginx
 ./deploy.sh stop
 
 # Reconstruir imagen
-docker-compose build --no-cache emas-app
+docker compose build --no-cache emas-app
 
 # Levantar servicios
 ./deploy.sh production
@@ -255,7 +255,7 @@ docker-compose build --no-cache emas-app
 
 ```bash
 # Escalar aplicación
-docker-compose up -d --scale emas-app=3
+docker compose up -d --scale emas-app=3
 
 # Escalar con balanceador de carga
 # Agregar HAProxy o Traefik al docker-compose.yml
@@ -268,7 +268,7 @@ docker-compose up -d --scale emas-app=3
 docker stats
 
 # Ver logs de Prometheus
-docker-compose logs prometheus
+docker compose logs prometheus
 ```
 
 ## 🧪 Testing

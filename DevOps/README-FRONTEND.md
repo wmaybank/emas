@@ -43,8 +43,8 @@ chmod +x DevOps/deploy-fullstack.sh
 ### Despliegue Manual
 ```bash
 # Construir y desplegar
-docker-compose -f DevOps/docker-compose.fullstack.yml build
-docker-compose -f DevOps/docker-compose.fullstack.yml up -d
+docker compose -f DevOps/docker-compose.fullstack.yml build
+docker compose -f DevOps/docker-compose.fullstack.yml up -d
 
 # Verificar
 curl http://localhost/           # Frontend
@@ -79,16 +79,16 @@ cd frontend && npm start
 
 ```bash
 # Ver logs del contenedor principal
-docker-compose -f DevOps/docker-compose.fullstack.yml logs -f emas-fullstack
+docker compose -f DevOps/docker-compose.fullstack.yml logs -f emas-fullstack
 
 # Acceder al contenedor
 docker exec -it emas-fullstack sh
 
 # Reiniciar solo el servicio principal
-docker-compose -f DevOps/docker-compose.fullstack.yml restart emas-fullstack
+docker compose -f DevOps/docker-compose.fullstack.yml restart emas-fullstack
 
 # Detener todo
-docker-compose -f DevOps/docker-compose.fullstack.yml down
+docker compose -f DevOps/docker-compose.fullstack.yml down
 ```
 
 ## Ventajas del Nuevo Setup

@@ -20,6 +20,13 @@ COMPOSE_DEV_FILE="DevOps/docker-compose.dev.yml"
 PROJECT_NAME="emas"
 BACKUP_DIR="./backups/$(date +%Y%m%d_%H%M%S)"
 
+# Detectar comando de Docker Compose
+if docker compose version &> /dev/null; then
+    DOCKER_COMPOSE_CMD="docker compose"
+else
+    DOCKER_COMPOSE_CMD="docker-compose"
+fi
+
 # Función para logging
 log() {
     echo -e "${BLUE}[$(date +'%Y-%m-%d %H:%M:%S')]${NC} $1"
@@ -46,7 +53,8 @@ check_dependencies() {
         exit 1
     fi
     
-    if ! command -v docker-compose &> /dev/null; then
+    # Verificar si está disponible docker compose (nuevo) o docker-compose (legacy)
+    if ! docker compose version &> /dev/null && ! command -v docker-compose &> /dev/null; then
         error "Docker Compose no está instalado"
         exit 1
     fi
@@ -102,11 +110,11 @@ stop_services() {
     log "Deteniendo servicios existentes..."
     
     if [ -f "$COMPOSE_FILE" ]; then
-        docker-compose -f "$COMPOSE_FILE" -p "$PROJECT_NAME" down || true
+        $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" -p "$PROJECT_NAME" down || true
     fi
     
     if [ -f "$COMPOSE_DEV_FILE" ]; then
-        docker-compose -f "$COMPOSE_DEV_FILE" -p "$PROJECT_NAME" down || true
+        $DOCKER_COMPOSE_CMD -f "$COMPOSE_DEV_FILE" -p "$PROJECT_NAME" down || true
     fi
     
     success "Servicios detenidos"
@@ -130,9 +138,9 @@ build_image() {
     log "Construyendo imagen de la aplicación (Frontend + Backend)..."
     
     if [ "$ENVIRONMENT" = "production" ]; then
-        docker-compose -f "$COMPOSE_FILE" -p "$PROJECT_NAME" build --no-cache emas-fullstack
+        $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" -p "$PROJECT_NAME" build --no-cache emas-fullstack
     else
-        docker-compose -f "$COMPOSE_DEV_FILE" -p "$PROJECT_NAME" build --no-cache emas-app
+        $DOCKER_COMPOSE_CMD -f "$COMPOSE_DEV_FILE" -p "$PROJECT_NAME" build --no-cache emas-app
     fi
     
     success "Imagen construida exitosamente"
@@ -143,7 +151,7 @@ deploy_app() {
     log "Desplegando aplicación en modo $ENVIRONMENT..."
     
     if [ "$ENVIRONMENT" = "production" ]; then
-        docker-compose -f "$COMPOSE_FILE" -p "$PROJECT_NAME" up -d
+        $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" -p "$PROJECT_NAME" up -d
         
         # Verificar que el frontend esté siendo servido
         log "Verificando despliegue del frontend..."
@@ -162,7 +170,7 @@ deploy_app() {
         fi
         
     else
-        docker-compose -f "$COMPOSE_DEV_FILE" -p "$PROJECT_NAME" up -d
+        $DOCKER_COMPOSE_CMD -f "$COMPOSE_DEV_FILE" -p "$PROJECT_NAME" up -d
         success "Aplicación desplegada en modo desarrollo"
         warning "Recuerda ejecutar el frontend por separado con 'npm start' en el directorio frontend/"
     fi
@@ -173,9 +181,9 @@ check_services() {
     log "Verificando estado de los servicios..."
     
     if [ "$ENVIRONMENT" = "production" ]; then
-        COMPOSE_CMD="docker-compose -f $COMPOSE_FILE -p $PROJECT_NAME"
+        COMPOSE_CMD="$DOCKER_COMPOSE_CMD -f $COMPOSE_FILE -p $PROJECT_NAME"
     else
-        COMPOSE_CMD="docker-compose -f $COMPOSE_DEV_FILE -p $PROJECT_NAME"
+        COMPOSE_CMD="$DOCKER_COMPOSE_CMD -f $COMPOSE_DEV_FILE -p $PROJECT_NAME"
     fi
     
     # Mostrar estado de contenedores
@@ -216,9 +224,9 @@ show_logs() {
     log "Mostrando logs de la aplicación..."
     
     if [ "$ENVIRONMENT" = "production" ]; then
-        docker-compose -f "$COMPOSE_FILE" -p "$PROJECT_NAME" logs --tail=50 emas-fullstack
+        $DOCKER_COMPOSE_CMD -f "$COMPOSE_FILE" -p "$PROJECT_NAME" logs --tail=50 emas-fullstack
     else
-        docker-compose -f "$COMPOSE_DEV_FILE" -p "$PROJECT_NAME" logs --tail=50 emas-app
+        $DOCKER_COMPOSE_CMD -f "$COMPOSE_DEV_FILE" -p "$PROJECT_NAME" logs --tail=50 emas-app
     fi
 }
 
@@ -257,8 +265,8 @@ show_final_info() {
     
     echo ""
     echo "Comandos útiles:"
-    echo "  Ver logs: docker-compose -f $COMPOSE_FILE -p $PROJECT_NAME logs -f"
-    echo "  Detener: docker-compose -f $COMPOSE_FILE -p $PROJECT_NAME down"
+    echo "  Ver logs: $DOCKER_COMPOSE_CMD -f $COMPOSE_FILE -p $PROJECT_NAME logs -f"
+    echo "  Detener: $DOCKER_COMPOSE_CMD -f $COMPOSE_FILE -p $PROJECT_NAME down"
     echo "  Reiniciar: $0 $ENVIRONMENT"
     echo ""
 }
