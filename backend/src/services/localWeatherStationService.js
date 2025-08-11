@@ -438,7 +438,7 @@ class LocalWeatherStationService {
         }
 
         // Datos de humedad
-        if (sensor.humidity) {
+        if (sensor.humidity && sensor.humidity.current !== undefined) {
           reading.humidity = sensor.humidity.current;
         }
 
@@ -473,31 +473,31 @@ class LocalWeatherStationService {
             reading.rain_rate_hi = sensor.rain.rate.hi;
           }
           
-          // Datos de tormenta
-          if (sensor.rain.storm) {
+          // Datos de tormenta - verificar que storm existe y tiene las propiedades
+          if (sensor.rain.storm && sensor.rain.storm.last15min !== undefined) {
             reading.rainfall_15min = sensor.rain.storm.last15min;
             reading.rainfall_60min = sensor.rain.storm.last60min;
             reading.rainfall_24hr = sensor.rain.storm.last24hr;
           }
           
-          // Acumulados
-          reading.rainfall_daily = sensor.rain.daily;
-          reading.rainfall_monthly = sensor.rain.monthly;
-          reading.rainfall_year = sensor.rain.yearly;
-          reading.rain_storm = sensor.rain.stormCurrent;
-          reading.rain_storm_start = sensor.rain.stormStart;
+          // Acumulados - verificar que existen
+          if (sensor.rain.daily !== undefined) reading.rainfall_daily = sensor.rain.daily;
+          if (sensor.rain.monthly !== undefined) reading.rainfall_monthly = sensor.rain.monthly;
+          if (sensor.rain.yearly !== undefined) reading.rainfall_year = sensor.rain.yearly;
+          if (sensor.rain.stormCurrent !== undefined) reading.rain_storm = sensor.rain.stormCurrent;
+          if (sensor.rain.stormStart !== undefined) reading.rain_storm_start = sensor.rain.stormStart;
         }
 
         // Datos solares
         if (sensor.solar) {
-          reading.solar_radiation = sensor.solar.radiation;
-          reading.uv_index = sensor.solar.uvIndex;
+          if (sensor.solar.radiation !== undefined) reading.solar_radiation = sensor.solar.radiation;
+          if (sensor.solar.uvIndex !== undefined) reading.uv_index = sensor.solar.uvIndex;
         }
 
         // Estado del sistema
         if (sensor.system) {
-          reading.rx_state = sensor.system.rxState;
-          reading.battery_flag = sensor.system.batteryFlag;
+          if (sensor.system.rxState !== undefined) reading.rx_state = sensor.system.rxState;
+          if (sensor.system.batteryFlag !== undefined) reading.battery_flag = sensor.system.batteryFlag;
         }
       } else if (sensor.type === 'Barometer') {
         // Datos de presión barométrica
