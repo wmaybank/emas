@@ -14,3 +14,113 @@
 2025-08-11 15:53:22 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
 2025-08-11 15:53:22 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
 2025-08-11 15:53:22 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:54:32 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:54:32 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:54:32 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:54:32 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:55:00 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:55:00 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:55:00 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:55:00 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:55:00 [ERROR]: Error al verificar alertas: currentData is not iterable {"service":"emas-weather","version":"1.0.0","stack":"TypeError: currentData is not iterable\n    at Task._execution (D:\\Repos\\emas\\backend\\src\\app.js:175:33)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"}
+2025-08-11 15:55:02 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:55:02 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:55:02 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:55:02 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:55:32 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:55:32 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:55:32 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:55:32 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:56:00 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:56:00 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:56:00 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:56:00 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:56:00 [ERROR]: Error al verificar alertas: currentData is not iterable {"service":"emas-weather","version":"1.0.0","stack":"TypeError: currentData is not iterable\n    at Task._execution (D:\\Repos\\emas\\backend\\src\\app.js:175:33)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"}
+2025-08-11 15:56:02 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:56:02 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:56:02 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:56:02 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:56:32 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:56:32 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:56:32 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:56:32 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:57:00 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:57:00 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:57:00 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:57:00 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:57:00 [ERROR]: Error al verificar alertas: currentData is not iterable {"service":"emas-weather","version":"1.0.0","stack":"TypeError: currentData is not iterable\n    at Task._execution (D:\\Repos\\emas\\backend\\src\\app.js:175:33)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"}
+2025-08-11 15:57:02 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:57:02 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:57:02 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:57:02 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:57:32 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:57:32 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:57:32 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:57:32 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:58:00 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:58:00 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:58:00 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:58:00 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:58:00 [ERROR]: Error al verificar alertas: currentData is not iterable {"service":"emas-weather","version":"1.0.0","stack":"TypeError: currentData is not iterable\n    at Task._execution (D:\\Repos\\emas\\backend\\src\\app.js:175:33)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"}
+2025-08-11 15:58:02 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:58:02 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:58:02 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:58:02 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:58:32 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:58:32 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:58:32 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 15:58:32 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:00:39 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:00:39 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:00:39 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:00:39 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:01:00 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:01:00 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:01:00 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:01:00 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:01:00 [ERROR]: Error al verificar alertas: currentData is not iterable {"service":"emas-weather","version":"1.0.0","stack":"TypeError: currentData is not iterable\n    at Task._execution (D:\\Repos\\emas\\backend\\src\\app.js:175:33)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"}
+2025-08-11 16:01:09 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:01:09 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:01:09 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:01:09 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:01:54 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:01:54 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:01:54 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:01:54 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:02:00 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:02:00 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:02:00 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:02:00 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:02:00 [ERROR]: Error al verificar alertas: currentData is not iterable {"service":"emas-weather","version":"1.0.0","stack":"TypeError: currentData is not iterable\n    at Task._execution (D:\\Repos\\emas\\backend\\src\\app.js:175:33)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"}
+2025-08-11 16:02:24 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:02:24 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:02:24 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:02:24 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:02:46 [ERROR]: Excepción no capturada: listen EADDRINUSE: address already in use ::1:3001 {"service":"emas-weather","version":"1.0.0","code":"EADDRINUSE","errno":-4091,"syscall":"listen","address":"::1","port":3001,"stack":"Error: listen EADDRINUSE: address already in use ::1:3001\n    at Server.setupListenHandle [as _listen2] (node:net:1898:16)\n    at listenInCluster (node:net:1946:12)\n    at GetAddrInfoReqWrap.doListen [as callback] (node:net:2116:7)\n    at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:111:8)"}
+2025-08-11 16:02:54 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:02:54 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:02:54 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:02:54 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:03:00 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:03:00 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:03:00 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:03:00 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:03:00 [ERROR]: Error al verificar alertas: currentData is not iterable {"service":"emas-weather","version":"1.0.0","stack":"TypeError: currentData is not iterable\n    at Task._execution (D:\\Repos\\emas\\backend\\src\\app.js:175:33)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"}
+2025-08-11 16:03:15 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:03:15 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:03:15 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:03:15 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:03:45 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:03:45 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:03:45 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:03:45 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:03:49 [ERROR]: Excepción no capturada: listen EADDRINUSE: address already in use ::1:3001 {"service":"emas-weather","version":"1.0.0","code":"EADDRINUSE","errno":-4091,"syscall":"listen","address":"::1","port":3001,"stack":"Error: listen EADDRINUSE: address already in use ::1:3001\n    at Server.setupListenHandle [as _listen2] (node:net:1898:16)\n    at listenInCluster (node:net:1946:12)\n    at GetAddrInfoReqWrap.doListen [as callback] (node:net:2116:7)\n    at GetAddrInfoReqWrap.onlookup [as oncomplete] (node:dns:111:8)"}
+2025-08-11 16:04:00 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:04:00 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:04:00 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:04:00 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:04:00 [ERROR]: Error al verificar alertas: currentData is not iterable {"service":"emas-weather","version":"1.0.0","stack":"TypeError: currentData is not iterable\n    at Task._execution (D:\\Repos\\emas\\backend\\src\\app.js:175:33)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)"}
+2025-08-11 16:04:14 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:04:14 [ERROR]: Error al obtener datos de estación 192.168.1.100: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:04:14 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
+2025-08-11 16:04:14 [ERROR]: Error al obtener datos de estación 192.168.1.101: {"service":"emas-weather","version":"1.0.0"}
