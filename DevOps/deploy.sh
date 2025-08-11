@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script de despliegue para EMAS Weather Monitoring System
-# Uso: ./deploy.sh [production|development|stop|restart|logs|status]
+# Uso: ./deploy.sh [production|development|stop|restart|logs|status|clean|backup|update|help]
 
 set -e
 
@@ -39,6 +39,7 @@ show_help() {
     echo "  status       - Mostrar estado de los servicios"
     echo "  clean        - Limpiar contenedores, volúmenes y redes"
     echo "  backup       - Crear backup manual de la base de datos"
+    echo "  update       - Actualizar aplicación en producción (pull + rebuild)"
     echo "  help         - Mostrar esta ayuda"
     echo ""
     echo "Ejemplos:"
@@ -232,6 +233,52 @@ manual_backup() {
     echo -e "${GREEN}✅ Backup manual completado${NC}"
 }
 
+# Función para actualizar en producción
+update_production() {
+    echo -e "${BLUE}🔄 Iniciando actualización de EMAS en producción...${NC}"
+    
+    # Crear backup antes de actualizar
+    echo -e "${YELLOW}💾 Creando backup de seguridad...${NC}"
+    manual_backup
+    
+    # Hacer pull de los últimos cambios
+    echo -e "${YELLOW}📥 Descargando últimos cambios...${NC}"
+    cd "$(dirname "$(pwd)")"
+    git fetch origin
+    git pull origin main
+    cd DevOps
+    
+    # Verificar si hay cambios en archivos Docker
+    if git diff HEAD~1 HEAD --name-only | grep -E "(Dockerfile|docker-compose)" > /dev/null 2>&1; then
+        echo -e "${YELLOW}🏗️  Detectados cambios en Docker, reconstruyendo imágenes...${NC}"
+        
+        # Detener servicios
+        echo -e "${YELLOW}🛑 Deteniendo servicios...${NC}"
+        stop_services
+        
+        # Reconstruir imágenes
+        echo -e "${YELLOW}🏗️  Reconstruyendo imágenes...${NC}"
+        $DOCKER_COMPOSE_CMD -f docker-compose.fullstack.yml build --no-cache
+        
+        # Iniciar servicios
+        echo -e "${YELLOW}🚀 Iniciando servicios...${NC}"
+        deploy_production
+    else
+        echo -e "${YELLOW}ℹ️  No hay cambios en Docker files, reiniciando servicios...${NC}"
+        restart_services
+    fi
+    
+    # Verificar estado
+    echo -e "${YELLOW}🔍 Verificando estado de los servicios...${NC}"
+    sleep 10
+    show_status
+    
+    echo -e "${GREEN}✅ Actualización completada!${NC}"
+    echo -e "${BLUE}🌐 Frontend: http://localhost${NC}"
+    echo -e "${BLUE}📡 Backend: http://localhost:3001${NC}"
+    echo -e "${BLUE}📊 Prometheus: http://localhost:9090${NC}"
+}
+
 # Función principal
 main() {
     case "${1:-help}" in
@@ -260,6 +307,9 @@ main() {
             ;;
         "backup")
             manual_backup
+            ;;
+        "update")
+            update_production
             ;;
         "help"|*)
             show_help

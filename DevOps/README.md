@@ -67,6 +67,7 @@ chmod +x deploy.sh
 ./deploy.sh status        # Mostrar estado de los servicios
 ./deploy.sh clean         # Limpiar contenedores y volúmenes
 ./deploy.sh backup        # Crear backup manual
+./deploy.sh update        # Actualizar aplicación en producción
 ./deploy.sh help          # Mostrar ayuda
 ```
 
@@ -225,6 +226,44 @@ docker network inspect emas_emas_network
 
 # Verificar conectividad
 docker exec emas-app ping nginx
+```
+
+## 🔄 Actualizaciones en Producción
+
+### Actualización Automática (Recomendado)
+
+```bash
+# Actualización completa con backup automático
+./deploy.sh update
+```
+
+Este comando realiza:
+1. 💾 **Backup automático** de la base de datos
+2. 📥 **Pull** de los últimos cambios de GitHub
+3. 🏗️ **Rebuild** de imágenes Docker (solo si hay cambios)
+4. 🚀 **Restart** de los servicios
+5. 🔍 **Verificación** del estado final
+
+### Actualización Manual
+
+```bash
+# 1. Crear backup
+./deploy.sh backup
+
+# 2. Descargar cambios
+git pull origin main
+
+# 3. Reconstruir y reiniciar
+./deploy.sh stop
+docker compose -f docker-compose.fullstack.yml build --no-cache
+./deploy.sh production
+```
+
+### Actualización Solo de Código (Sin Docker Changes)
+
+```bash
+# Si solo hay cambios en código Node.js/React
+./deploy.sh restart
 ```
 
 ## 🔄 Actualizaciones
