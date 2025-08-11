@@ -144,10 +144,10 @@ class LocalWeatherStationService {
    */
   processStationData(station, rawData) {
     const processed = {
-      stationId: station.ip,
+      station_id: station.ip,
       stationIp: station.ip,
       stationPort: station.port,
-      timestamp: new Date(rawData.data.ts * 1000),
+      timestamp: Math.floor(new Date(rawData.data.ts * 1000).getTime() / 1000), // timestamp en segundos
       deviceId: rawData.data.did,
       status: 'online',
       sensors: []
@@ -396,13 +396,103 @@ class LocalWeatherStationService {
    * Notificar a todos los callbacks registrados
    */
   notifyDataCallbacks(data) {
+    // Convertir datos estructurados a formato de base de datos
+    const dbReadings = data.map(stationData => this.convertToDbFormat(stationData)).filter(Boolean);
+    
     this.dataCallbacks.forEach(callback => {
       try {
-        callback(data);
+        callback(dbReadings);
       } catch (error) {
         logger.error('Error en callback de datos:', error);
       }
     });
+  }
+
+  /**
+   * Convertir datos estructurados a formato de base de datos
+   */
+  convertToDbFormat(stationData) {
+    if (!stationData.sensors || stationData.sensors.length === 0) {
+      return null;
+    }
+
+    // Crear objeto base para la lectura
+    const reading = {
+      station_id: stationData.station_id,
+      timestamp: stationData.timestamp,
+      device_id: stationData.deviceId
+    };
+
+    // Procesar cada sensor y extraer datos al formato plano
+    stationData.sensors.forEach(sensor => {
+      if (sensor.type === 'ISS') {
+        // Datos de temperatura
+        if (sensor.temperature) {
+          reading.temp = sensor.temperature.current;
+          reading.dew_point = sensor.temperature.dewPoint;
+          reading.heat_index = sensor.temperature.heatIndex;
+          reading.wind_chill = sensor.temperature.windChill;
+        }
+
+        // Datos de humedad
+        if (sensor.humidity) {
+          reading.humidity = sensor.humidity.current;
+        }
+
+        // Datos de viento
+        if (sensor.wind) {
+          reading.wind_speed_last = sensor.wind.speed.last;
+          reading.wind_speed_avg_1min = sensor.wind.speed.avg1min;
+          reading.wind_speed_avg_2min = sensor.wind.speed.avg2min;
+          reading.wind_speed_avg_10min = sensor.wind.speed.avg10min;
+          reading.wind_speed_hi_2min = sensor.wind.speed.hi2min;
+          reading.wind_speed_hi_10min = sensor.wind.speed.hi10min;
+          
+          reading.wind_dir_last = sensor.wind.direction.last;
+          reading.wind_dir_avg_1min = sensor.wind.direction.avg1min;
+          reading.wind_dir_avg_2min = sensor.wind.direction.avg2min;
+          reading.wind_dir_avg_10min = sensor.wind.direction.avg10min;
+          reading.wind_dir_at_hi_speed_2min = sensor.wind.direction.atHiSpeed2min;
+          reading.wind_dir_at_hi_speed_10min = sensor.wind.direction.atHiSpeed10min;
+        }
+
+        // Datos de lluvia
+        if (sensor.rain) {
+          reading.rain_rate_last = sensor.rain.rate.last;
+          reading.rain_rate_hi = sensor.rain.rate.hi;
+          reading.rainfall_15min = sensor.rain.storm.last15min;
+          reading.rainfall_60min = sensor.rain.storm.last60min;
+          reading.rainfall_24hr = sensor.rain.storm.last24hr;
+          reading.rainfall_daily = sensor.rain.daily;
+          reading.rainfall_monthly = sensor.rain.monthly;
+          reading.rainfall_year = sensor.rain.yearly;
+          reading.rain_storm = sensor.rain.stormCurrent;
+          reading.rain_storm_start = sensor.rain.stormStart;
+        }
+
+        // Datos solares
+        if (sensor.solar) {
+          reading.solar_radiation = sensor.solar.radiation;
+          reading.uv_index = sensor.solar.uvIndex;
+        }
+
+        // Estado del sistema
+        if (sensor.system) {
+          reading.rx_state = sensor.system.rxState;
+          reading.battery_flag = sensor.system.batteryFlag;
+        }
+      } else if (sensor.type === 'Barometer') {
+        // Datos de presión barométrica
+        reading.barometer = sensor.pressure?.current;
+        reading.bar_trend = sensor.pressure?.trend;
+      } else if (sensor.type === 'TempHum') {
+        // Sensores adicionales de temperatura/humedad (indoor)
+        reading.temp_in = sensor.temperature?.current;
+        reading.humidity_in = sensor.humidity?.current;
+      }
+    });
+
+    return reading;
   }
 
   /**
