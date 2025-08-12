@@ -22,15 +22,15 @@ const StationDetail: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const [stationData, currentDataRes, alertsRes] = await Promise.all([
+      const [stationData, currentDataRes] = await Promise.all([
         weatherApi.getStation(id),
         weatherApi.getCurrentWeather(id),
-        weatherApi.getAlerts(),
       ]);
 
       setStation(stationData);
       setCurrentData(currentDataRes);
-      setAlerts(alertsRes.filter(alert => alert.stationId === id));
+      // setAlerts(alertsRes.filter(alert => alert.stationId === id)); // Temporarily disabled until alerts endpoint is fixed
+      setAlerts([]); // Set empty array for now
     } catch (err) {
       setError('Error al cargar datos de la estación');
       console.error('Station detail error:', err);
@@ -154,7 +154,7 @@ const StationDetail: React.FC = () => {
             <div>
               <label className="text-sm font-medium text-weather-gray-500">Coordenadas</label>
               <p className="text-sm text-weather-gray-900">
-                {station.coordinates.latitude.toFixed(4)}, {station.coordinates.longitude.toFixed(4)}
+                {station.coordinates?.latitude?.toFixed(4) || '0.0000'}, {station.coordinates?.longitude?.toFixed(4) || '0.0000'}
               </p>
             </div>
             <div>

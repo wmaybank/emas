@@ -13,7 +13,7 @@ function transformBackendStation(backendStation: any): WeatherStation {
       longitude: backendStation.longitude || 0
     },
     status: backendStation.active ? 'online' : 'offline',
-    lastUpdate: new Date(backendStation.created_at * 1000).toISOString(),
+    lastUpdate: backendStation.created_at ? new Date(backendStation.created_at * 1000).toISOString() : new Date().toISOString(),
     elevation: backendStation.altitude || 0,
     timezone: 'America/Bogota' // Valor por defecto
   };
@@ -103,7 +103,8 @@ class WeatherAPI {
   }
 
   async getStation(id: string): Promise<WeatherStation> {
-    return this.request<WeatherStation>(`/stations/${id}`);
+    const response = await this.request<{success: boolean, data: any}>(`/stations/${id}`);
+    return transformBackendStation(response.data);
   }
 
   async createStation(station: Omit<WeatherStation, 'id'>): Promise<WeatherStation> {
