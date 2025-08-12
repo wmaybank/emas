@@ -319,14 +319,20 @@ class LocalWeatherStationService {
   processTempHumSensor(condition) {
     return {
       temperature: {
-        current: condition.temp,
+        current: condition.temp_in,
         hi: condition.temp_hi,
         low: condition.temp_low
       },
       humidity: {
-        current: condition.hum,
+        current: condition.hum_in,
         hi: condition.hum_hi,
         low: condition.hum_low
+      },
+      dewPoint: {
+        current: condition.dew_point_in
+      },
+      heatIndex: {
+        current: condition.heat_index_in
       }
     };
   }
@@ -461,21 +467,21 @@ class LocalWeatherStationService {
           // Velocidades de viento
           if (sensor.wind.speed) {
             reading.wind_speed_last = sensor.wind.speed.last;
-            reading.wind_speed_avg_1min = sensor.wind.speed.avg1min;
-            reading.wind_speed_avg_2min = sensor.wind.speed.avg2min;
-            reading.wind_speed_avg_10min = sensor.wind.speed.avg10min;
-            reading.wind_speed_hi_2min = sensor.wind.speed.hi2min;
-            reading.wind_speed_hi_10min = sensor.wind.speed.hi10min;
+            reading.wind_speed_avg_1min = sensor.wind.speed.avg1Min;
+            reading.wind_speed_avg_2min = sensor.wind.speed.avg2Min;
+            reading.wind_speed_avg_10min = sensor.wind.speed.avg10Min;
+            reading.wind_speed_hi_2min = sensor.wind.speed.hi2Min;
+            reading.wind_speed_hi_10min = sensor.wind.speed.hi10Min;
           }
           
           // Direcciones de viento
           if (sensor.wind.direction) {
             reading.wind_dir_last = sensor.wind.direction.last;
-            reading.wind_dir_avg_1min = sensor.wind.direction.avg1min;
-            reading.wind_dir_avg_2min = sensor.wind.direction.avg2min;
-            reading.wind_dir_avg_10min = sensor.wind.direction.avg10min;
-            reading.wind_dir_at_hi_speed_2min = sensor.wind.direction.atHiSpeed2min;
-            reading.wind_dir_at_hi_speed_10min = sensor.wind.direction.atHiSpeed10min;
+            reading.wind_dir_avg_1min = sensor.wind.direction.avg1Min;
+            reading.wind_dir_avg_2min = sensor.wind.direction.avg2Min;
+            reading.wind_dir_avg_10min = sensor.wind.direction.avg10Min;
+            reading.wind_dir_at_hi_speed_2min = sensor.wind.direction.atHiSpeed2Min;
+            reading.wind_dir_at_hi_speed_10min = sensor.wind.direction.atHiSpeed10Min;
           }
         }
 
@@ -487,19 +493,17 @@ class LocalWeatherStationService {
             reading.rain_rate_hi = sensor.rain.rate.hi;
           }
           
-          // Datos de tormenta - verificar que storm existe y tiene las propiedades
-          if (sensor.rain.storm && sensor.rain.storm.last15min !== undefined) {
-            reading.rainfall_15min = sensor.rain.storm.last15min;
-            reading.rainfall_60min = sensor.rain.storm.last60min;
-            reading.rainfall_24hr = sensor.rain.storm.last24hr;
+          // Acumulaciones - usar la estructura accumulation
+          if (sensor.rain.accumulation) {
+            reading.rainfall_15min = sensor.rain.accumulation.last15Min;
+            reading.rainfall_60min = sensor.rain.accumulation.last60Min;
+            reading.rainfall_24hr = sensor.rain.accumulation.last24Hr;
+            reading.rain_storm = sensor.rain.accumulation.storm;
+            reading.rain_storm_start = sensor.rain.accumulation.stormStart;
+            reading.rainfall_daily = sensor.rain.accumulation.daily;
+            reading.rainfall_monthly = sensor.rain.accumulation.monthly;
+            reading.rainfall_year = sensor.rain.accumulation.yearly;
           }
-          
-          // Acumulados - verificar que existen
-          if (sensor.rain.daily !== undefined) reading.rainfall_daily = sensor.rain.daily;
-          if (sensor.rain.monthly !== undefined) reading.rainfall_monthly = sensor.rain.monthly;
-          if (sensor.rain.yearly !== undefined) reading.rainfall_year = sensor.rain.yearly;
-          if (sensor.rain.stormCurrent !== undefined) reading.rain_storm = sensor.rain.stormCurrent;
-          if (sensor.rain.stormStart !== undefined) reading.rain_storm_start = sensor.rain.stormStart;
         }
 
         // Datos solares
@@ -511,16 +515,22 @@ class LocalWeatherStationService {
         // Estado del sistema
         if (sensor.system) {
           if (sensor.system.rxState !== undefined) reading.rx_state = sensor.system.rxState;
-          if (sensor.system.batteryFlag !== undefined) reading.battery_flag = sensor.system.batteryFlag;
+          if (sensor.system.transBatteryFlag !== undefined) reading.battery_flag = sensor.system.transBatteryFlag;
         }
       } else if (sensor.type === 'Barometer') {
         // Datos de presión barométrica
-        reading.barometer = sensor.pressure?.current;
-        reading.bar_trend = sensor.pressure?.trend;
+        if (sensor.pressure) {
+          reading.barometer = sensor.pressure.current;
+          reading.bar_trend = sensor.pressure.trend;
+        }
       } else if (sensor.type === 'TempHum') {
         // Sensores adicionales de temperatura/humedad (indoor)
-        reading.temp_in = sensor.temperature?.current;
-        reading.humidity_in = sensor.humidity?.current;
+        if (sensor.temperature) {
+          reading.temp_in = sensor.temperature.current;
+        }
+        if (sensor.humidity) {
+          reading.humidity_in = sensor.humidity.current;
+        }
       }
     });
 
