@@ -3,7 +3,21 @@ const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const cron = require('node-cron');
-const path = require('path');
+con  // Job para monitoreo de conectividad
+  cron.schedule(`*/${config.cron.dataCollectionInterval} * * * * *`, async () => {
+    try {
+      logger.debug('Ejecutando job de monitoreo de conectividad...');
+      
+      // Usar el estado de las estaciones del servicio activo en lugar de hacer nuevas conexiones
+      const stationsStatus = localWeatherService.getStationsStatus();
+      const onlineStations = stationsStatus.filter(s => s.isOnline).length;
+      
+      logger.info(`Estado de conectividad: ${onlineStations}/${stationsStatus.length} estaciones online`);
+      
+    } catch (error) {
+      logger.error('Error en job de monitoreo de conectividad:', error);
+    }
+  });e('path');
 
 // Importar logger centralizado
 const logger = require('./utils/logger');

@@ -123,7 +123,15 @@ class LocalWeatherStationService {
 
     } catch (error) {
       if (error.code === 'ECONNREFUSED') {
-        logger.warn(`Estación ${station.ip} no disponible (conexión rechazada)`);
+        // Solo loggear como warning si es la primera vez en un período
+        const lastErrorKey = `${station.ip}_last_error`;
+        const lastErrorTime = this[lastErrorKey] || 0;
+        const now = Date.now();
+        
+        if (now - lastErrorTime > 60000) { // Solo cada minuto
+          logger.warn(`Estación ${station.ip} no disponible (conexión rechazada)`);
+          this[lastErrorKey] = now;
+        }
       } else if (error.code === 'ETIMEDOUT') {
         logger.warn(`Timeout al conectar con estación ${station.ip}`);
       } else {
@@ -365,13 +373,19 @@ class LocalWeatherStationService {
    * Obtener estado de todas las estaciones
    */
   getStationsStatus() {
+    const now = Date.now();
+    const staleThreshold = (this.pollingInterval * 1000) * 2; // 2 veces el intervalo de polling
+    
     return this.stations.map(station => {
       const lastData = this.lastData.get(station.ip);
+      const isOnline = lastData && (now - lastData.lastUpdate.getTime()) < staleThreshold;
+      
       return {
         ip: station.ip,
         port: station.port,
         baseUrl: station.baseUrl,
-        status: lastData ? 'online' : 'offline',
+        status: isOnline ? 'online' : 'offline',
+        isOnline: isOnline,
         lastUpdate: lastData ? lastData.lastUpdate : null,
         lastData: lastData ? {
           timestamp: lastData.timestamp,
