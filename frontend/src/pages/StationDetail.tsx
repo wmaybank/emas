@@ -196,10 +196,11 @@ const StationDetail: React.FC = () => {
               {/* Presión */}
               <div className="text-center">
                 <div className="text-3xl font-bold text-weather-gray-900 mb-2">
-                  {currentData.pressure.current} hPa
+                  {currentData.pressure.current} {currentData.pressure.unit}
                 </div>
                 <div className="text-sm text-weather-gray-600 capitalize">
-                  {currentData.pressure.trend}
+                  {currentData.pressure.trend === 'rising' ? 'Subiendo' : 
+                   currentData.pressure.trend === 'falling' ? 'Bajando' : 'Estable'}
                 </div>
                 <div className="text-xs text-weather-gray-400 mt-1">Presión</div>
               </div>
@@ -207,7 +208,7 @@ const StationDetail: React.FC = () => {
               {/* Viento */}
               <div className="text-center">
                 <div className="text-3xl font-bold text-weather-gray-900 mb-2">
-                  {currentData.wind.speed} km/h
+                  {currentData.wind.speed} {currentData.wind.unit}
                 </div>
                 <div className="text-sm text-weather-gray-600">
                   Dirección: {currentData.wind.direction}°

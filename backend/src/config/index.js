@@ -102,6 +102,13 @@ const config = {
     rain: process.env.DEFAULT_RAIN_UNIT || 'in'
   },
 
+  timezone: {
+    // Zona horaria para Buenos Aires, Argentina
+    name: process.env.TIMEZONE || 'America/Argentina/Buenos_Aires',
+    offset: process.env.TIMEZONE_OFFSET || '-3', // UTC-3
+    displayName: process.env.TIMEZONE_DISPLAY || 'Buenos Aires'
+  },
+
   validation: {
     // Validaciones específicas para estaciones locales
     maxStations: 10,

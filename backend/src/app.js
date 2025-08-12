@@ -64,6 +64,9 @@ app.use('/api/stations', stationsController);
 app.use('/api/data', dataController);
 app.use('/api/reports', reportsController);
 
+// Servir archivos estáticos del frontend
+app.use(express.static(path.join(__dirname, '..', 'public')));
+
 // Ruta de salud del sistema
 app.get('/api/health', (req, res) => {
   res.json({
@@ -80,8 +83,32 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Ruta raíz
-app.get('/', (req, res) => {
+// Ruta para obtener URL del WebSocket
+app.get('/api/websocket/url', (req, res) => {
+  res.json({
+    url: `ws://${req.headers.host}${config.websocket.path}`
+  });
+});
+
+// Ruta ping para verificar conectividad
+app.get('/api/ping', (req, res) => {
+  res.json({
+    status: 'pong',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Ruta para obtener versión
+app.get('/api/version', (req, res) => {
+  res.json({
+    version: '1.0.0',
+    build: 'enhanced-dashboard',
+    date: new Date().toISOString()
+  });
+});
+
+// Ruta raíz de API
+app.get('/api', (req, res) => {
   res.json({
     name: 'EMAS Weather Monitoring System',
     version: '1.0.0',
@@ -95,6 +122,22 @@ app.get('/', (req, res) => {
     },
     documentation: '/api/docs',
     timestamp: new Date().toISOString()
+  });
+});
+
+// Ruta para servir el frontend en cualquier ruta (SPA)
+app.get('*', (req, res, next) => {
+  // Si es una ruta de API, continuar con el siguiente middleware
+  if (req.path.startsWith('/api/')) {
+    return next();
+  }
+  
+  // Servir index.html para todas las demás rutas
+  res.sendFile(path.join(__dirname, '..', 'public', 'index.html'), (err) => {
+    if (err) {
+      logger.error('Error sirviendo index.html:', err);
+      res.status(500).send('Error interno del servidor');
+    }
   });
 });
 

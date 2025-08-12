@@ -3,9 +3,7 @@ version: '3.8'
 services:
   # Servicio principal de la aplicación
   emas-app:
-    build:
-      context: ..
-      dockerfile: DevOps/Dockerfile
+    image: emas-weather:latest
     container_name: emas-weather-app
     restart: unless-stopped
     env_file:

@@ -95,11 +95,11 @@ const StationCard: React.FC<StationCardProps> = ({ summary }) => {
       {currentData && (
         <div className="grid grid-cols-3 gap-2 text-xs text-weather-gray-600 mb-4">
           <div className="text-center">
-            <div className="font-medium">{currentData.pressure.current} hPa</div>
+            <div className="font-medium">{currentData.pressure.current} {currentData.pressure.unit}</div>
             <div>Presión</div>
           </div>
           <div className="text-center">
-            <div className="font-medium">{currentData.wind.speed} km/h</div>
+            <div className="font-medium">{currentData.wind.speed} {currentData.wind.unit}</div>
             <div>Viento</div>
           </div>
           <div className="text-center">

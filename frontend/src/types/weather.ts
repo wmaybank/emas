@@ -24,6 +24,9 @@ export interface WeatherData {
     unit: string;
     low: number;
     high: number;
+    interior?: number;
+    windChill?: number;
+    dewPoint?: number;
   };
   humidity: {
     current: number;
@@ -32,6 +35,7 @@ export interface WeatherData {
     avg: number;
     low: number;
     high: number;
+    interior?: number;
   };
   pressure: {
     current: number;

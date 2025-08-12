@@ -13,18 +13,19 @@ RUN apk update && apk add --no-cache \
 WORKDIR /app
 
 # Copiar package.json y package-lock.json
-COPY backend/package*.json ./
+COPY package*.json ./
 
 # Instalar dependencias
-RUN npm ci --only=production && npm cache clean --force
+RUN npm install --only=production && npm cache clean --force
 
 # Copiar código fuente
 COPY backend/src ./src
-COPY backend/config ./config
-COPY backend/scripts ./scripts
+
+# Copiar frontend build
+COPY frontend/build ./public
 
 # Crear directorios necesarios
-RUN mkdir -p data logs backups
+RUN mkdir -p data logs backups config scripts
 
 # Crear usuario no-root para seguridad
 RUN addgroup -g 1001 -S nodejs && \
@@ -42,4 +43,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD node -e "require('http').get('http://localhost:3001/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
 # Comando de inicio
-CMD ["npm", "start"]
+CMD ["node", "src/app.js"]
