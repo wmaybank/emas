@@ -23,7 +23,7 @@ sleep 2
 
 # Cambiar al usuario nodejs para el backend
 echo "Iniciando backend Node.js..."
-su - nodejs -c "cd /app && npm start" &
+su nodejs -c "cd /app && npm start" &
 NODE_PID=$!
 
 # Función para verificar si los procesos están corriendo
