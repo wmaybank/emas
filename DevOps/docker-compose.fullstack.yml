@@ -6,11 +6,9 @@ services:
       dockerfile: DevOps/Dockerfile.frontend
     container_name: emas-fullstack
     restart: unless-stopped
+    network_mode: host
     env_file:
       - .env
-    ports:
-      - "80:80"
-      - "3001:3001"
     environment:
       - NODE_ENV=${NODE_ENV}
       - PORT=${PORT}
@@ -36,8 +34,6 @@ services:
       - emas_logs:/app/logs
       - emas_backups:/app/backups
       - nginx_logs:/var/log/nginx
-    networks:
-      - emas_network
     depends_on:
       - emas-db
     healthcheck:
@@ -86,13 +82,10 @@ services:
     image: prom/prometheus:latest
     container_name: emas-prometheus
     restart: unless-stopped
-    ports:
-      - "9090:9090"
+    network_mode: host
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - emas_prometheus:/prometheus
-    networks:
-      - emas_network
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
