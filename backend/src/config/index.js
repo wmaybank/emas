@@ -1,8 +1,18 @@
 const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../../.env') });
+const fs = require('fs');
 
-// Debug temporal - verificar si se está leyendo el .env
-console.log('🔍 Debug .env path:', path.join(__dirname, '../../.env'));
+// Intentar cargar .env solo si existe (para desarrollo local)
+const envPath = path.join(__dirname, '../../.env');
+if (fs.existsSync(envPath)) {
+  require('dotenv').config({ path: envPath });
+  console.log('🔍 Debug .env cargado desde:', envPath);
+} else {
+  console.log('🔍 No se encontró .env, usando variables de entorno del sistema');
+}
+
+console.log('🔍 HOST from env:', process.env.HOST);
+console.log('🔍 PORT from env:', process.env.PORT);
+console.log('🔍 All env vars starting with H:', Object.keys(process.env).filter(k => k.startsWith('H')).map(k => `${k}=${process.env[k]}`));
 console.log('🔍 WEATHER_STATIONS from env:', process.env.WEATHER_STATIONS);
 console.log('🔍 Current working directory:', process.cwd());
 

@@ -1,10 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const DatabaseService = require('../services/databaseService');
 const logger = require('../utils/logger');
-
-// Instanciar servicio de base de datos
-const dbService = new DatabaseService();
 
 /**
  * @route GET /api/data/current
@@ -13,6 +9,7 @@ const dbService = new DatabaseService();
  */
 router.get('/current', async (req, res) => {
   try {
+    const dbService = req.app.locals.dbService;
     const currentData = await dbService.getCurrentData();
     res.json({
       success: true,
@@ -37,6 +34,7 @@ router.get('/current', async (req, res) => {
 router.get('/current/:stationId', async (req, res) => {
   try {
     const { stationId } = req.params;
+    const dbService = req.app.locals.dbService;
     const currentData = await dbService.getCurrentDataByStation(stationId);
     
     if (!currentData) {

@@ -4,7 +4,7 @@ const fs = require('fs');
 
 class DatabaseService {
   constructor() {
-    this.dbPath = path.join(__dirname, '../../database/weather.db');
+    this.dbPath = process.env.DB_PATH || path.join(__dirname, '../../data/weather.db');
     this.db = null;
     this.ensureDatabaseDirectory();
   }
@@ -261,9 +261,14 @@ class DatabaseService {
 
   async getAllCurrentConditions() {
     const sql = `
-      SELECT DISTINCT ON (station_id) *
-      FROM weather_readings 
-      ORDER BY station_id, timestamp DESC
+      SELECT wr.*
+      FROM weather_readings wr
+      INNER JOIN (
+        SELECT station_id, MAX(timestamp) as max_timestamp
+        FROM weather_readings
+        GROUP BY station_id
+      ) latest ON wr.station_id = latest.station_id AND wr.timestamp = latest.max_timestamp
+      ORDER BY wr.station_id
     `;
     
     return await this.all(sql);
@@ -512,6 +517,100 @@ class DatabaseService {
       status: 'backup_placeholder',
       message: 'Método de respaldo pendiente de implementación',
       timestamp: new Date().toISOString()
+    };
+  }
+
+  // Métodos alias para compatibilidad con el controlador
+  async getCurrentData() {
+    return this.getAllCurrentConditions();
+  }
+
+  async getCurrentDataByStation(stationId) {
+    return this.getCurrentConditions(stationId);
+  }
+
+  async getHistoricalData(filters) {
+    const { stationId, startDate, endDate, limit = 1000, offset = 0 } = filters;
+    
+    if (stationId && startDate && endDate) {
+      // Convertir fechas a timestamps
+      const startTimestamp = Math.floor(startDate.getTime() / 1000);
+      const endTimestamp = Math.floor(endDate.getTime() / 1000);
+      return this.getWeatherReadingsByDateRange(stationId, startTimestamp, endTimestamp);
+    } else if (stationId) {
+      return this.getWeatherReadings(stationId, limit, offset);
+    } else {
+      // Obtener datos de todas las estaciones (simplificado)
+      const stations = await this.getAllStations();
+      const allData = [];
+      for (const station of stations) {
+        const data = await this.getWeatherReadings(station.id, limit, offset);
+        allData.push(...data);
+      }
+      return allData;
+    }
+  }
+
+  async getDataStatistics(filters) {
+    const { stationId, startDate, endDate, groupBy } = filters;
+    
+    if (groupBy === 'day' && startDate) {
+      const dateStr = startDate.toISOString().split('T')[0];
+      return this.getDailyStats(stationId, dateStr);
+    } else if (groupBy === 'month' && startDate) {
+      return this.getMonthlyStats(stationId, startDate.getFullYear(), startDate.getMonth() + 1);
+    } else if (groupBy === 'year' && startDate) {
+      return this.getYearlyStats(stationId, startDate.getFullYear());
+    }
+    
+    // Fallback a datos actuales
+    return this.getCurrentConditions(stationId);
+  }
+
+  async getAvailableParameters() {
+    return [
+      'temperature',
+      'humidity', 
+      'pressure',
+      'wind_speed',
+      'wind_direction',
+      'rainfall',
+      'solar_radiation',
+      'uv_index'
+    ];
+  }
+
+  async exportDataToCSV(filters) {
+    const data = await this.getHistoricalData(filters);
+    if (!data || data.length === 0) {
+      return 'No data available\n';
+    }
+
+    // Crear header CSV
+    const headers = Object.keys(data[0]).join(',');
+    
+    // Crear filas CSV
+    const rows = data.map(row => 
+      Object.values(row).map(value => 
+        typeof value === 'string' ? `"${value}"` : value
+      ).join(',')
+    );
+
+    return [headers, ...rows].join('\n');
+  }
+
+  async getActiveAlerts() {
+    // Implementación básica - retornar array vacío por ahora
+    return [];
+  }
+
+  async createAlert(alertData) {
+    // Implementación básica - retornar el objeto con ID
+    return {
+      id: Date.now().toString(),
+      ...alertData,
+      created_at: new Date().toISOString(),
+      active: true
     };
   }
 
