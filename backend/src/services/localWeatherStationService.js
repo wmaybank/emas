@@ -106,8 +106,11 @@ class LocalWeatherStationService {
       const data = response.data;
       
       if (!data.data || !data.data.conditions) {
+        logger.error(`Formato de respuesta inválido de estación ${station.ip}:`, JSON.stringify(data, null, 2));
         throw new Error('Formato de respuesta inválido');
       }
+
+      logger.debug(`Datos recibidos de estación ${station.ip}: ${data.data.conditions.length} sensores`);
 
       // Procesar y normalizar datos
       const processedData = this.processStationData(station, data);
@@ -258,7 +261,10 @@ class LocalWeatherStationService {
           stormStart: condition.rain_storm_start_at,
           daily: condition.rainfall_daily,
           monthly: condition.rainfall_monthly,
-          yearly: condition.rainfall_year
+          yearly: condition.rainfall_year,
+          stormLast: condition.rain_storm_last,
+          stormLastStart: condition.rain_storm_last_start_at,
+          stormLastEnd: condition.rain_storm_last_end_at
         }
       },
       solar: {
@@ -308,7 +314,7 @@ class LocalWeatherStationService {
       pressure: {
         current: condition.bar_sea_level,
         trend: condition.bar_trend,
-        altimeter: condition.bar_altimeter
+        absolute: condition.bar_absolute
       }
     };
   }
@@ -343,9 +349,9 @@ class LocalWeatherStationService {
   getSensorType(dataStructureType) {
     const types = {
       1: 'ISS',
-      2: 'Soil/Leaf',
+      2: 'Leaf/Soil',
       3: 'Barometer',
-      4: 'Temp/Humidity'
+      4: 'TempHum'
     };
     return types[dataStructureType] || 'Unknown';
   }
