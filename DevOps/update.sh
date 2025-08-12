@@ -15,7 +15,8 @@ echo "📂 Directorio del proyecto: $PROJECT_DIR"
 # Hacer backup de la base de datos antes de actualizar
 echo "💾 Creando backup de la base de datos..."
 cd DevOps
-./deploy.sh backup
+# No hacer backup automático para actualizaciones simples
+# El backup se puede hacer manualmente si es necesario
 
 # Hacer pull de los últimos cambios
 echo "📥 Descargando últimos cambios..."
@@ -36,22 +37,22 @@ cd DevOps
 
 if [ "$REBUILD_NEEDED" = true ]; then
     echo "🛑 Deteniendo servicios..."
-    ./deploy.sh stop
+    docker compose -f docker-compose.fullstack.yml down
     
     echo "🏗️  Reconstruyendo imágenes..."
     docker compose -f docker-compose.fullstack.yml build --no-cache
     
     echo "🚀 Iniciando servicios..."
-    ./deploy.sh production
+    ./deploy-fullstack.sh production
 else
     echo "🔄 Reiniciando servicios..."
-    ./deploy.sh restart
+    docker compose -f docker-compose.fullstack.yml restart
 fi
 
 # Verificar que los servicios estén funcionando
 echo "🔍 Verificando estado de los servicios..."
 sleep 10
-./deploy.sh status
+docker compose -f docker-compose.fullstack.yml ps
 
 echo "✅ Actualización completada!"
 echo "🌐 Frontend: http://localhost"

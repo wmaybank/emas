@@ -46,29 +46,31 @@ cp env.docker .env
 ### 3. Desplegar
 
 ```bash
-# Dar permisos de ejecución al script
-chmod +x deploy.sh
+# Dar permisos de ejecución a los scripts
+chmod +x deploy-fullstack.sh
+chmod +x update.sh
 
-# Desplegar en producción (completo)
-./deploy.sh production
+# Desplegar en producción (completo con frontend)
+./deploy-fullstack.sh production
 
-# O desplegar en desarrollo (solo app + db)
-./deploy.sh development
+# O desplegar en desarrollo (solo backend)
+./deploy-fullstack.sh development
 ```
 
 ## 📋 Comandos Disponibles
 
 ```bash
-./deploy.sh production    # Desplegar en modo producción
-./deploy.sh development   # Desplegar en modo desarrollo
-./deploy.sh stop          # Detener todos los servicios
-./deploy.sh restart       # Reiniciar todos los servicios
-./deploy.sh logs          # Mostrar logs en tiempo real
-./deploy.sh status        # Mostrar estado de los servicios
-./deploy.sh clean         # Limpiar contenedores y volúmenes
-./deploy.sh backup        # Crear backup manual
-./deploy.sh update        # Actualizar aplicación en producción
-./deploy.sh help          # Mostrar ayuda
+# Comandos principales
+./deploy-fullstack.sh production     # Desplegar stack completo en producción
+./deploy-fullstack.sh development    # Desplegar solo backend en desarrollo
+./update.sh                          # Actualizar aplicación en producción
+
+# Comandos de Docker Compose directos
+docker compose -f docker-compose.fullstack.yml up -d      # Iniciar servicios
+docker compose -f docker-compose.fullstack.yml down       # Detener servicios
+docker compose -f docker-compose.fullstack.yml restart    # Reiniciar servicios
+docker compose -f docker-compose.fullstack.yml logs -f    # Ver logs en tiempo real
+docker compose -f docker-compose.fullstack.yml ps         # Ver estado de servicios
 ```
 
 ## 🔧 Configuración
