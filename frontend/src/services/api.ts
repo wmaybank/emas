@@ -2,6 +2,74 @@ import { WeatherStation, WeatherData, Alert, ReportData, SystemHealth } from '..
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
+// Función para convertir estación del backend al formato del frontend
+function transformBackendStation(backendStation: any): WeatherStation {
+  return {
+    id: backendStation.id,
+    name: backendStation.name || `Estación ${backendStation.id}`,
+    location: backendStation.location || `Ubicación ${backendStation.id}`,
+    coordinates: {
+      latitude: backendStation.latitude || 0,
+      longitude: backendStation.longitude || 0
+    },
+    status: backendStation.active ? 'online' : 'offline',
+    lastUpdate: new Date(backendStation.created_at * 1000).toISOString(),
+    elevation: backendStation.altitude || 0,
+    timezone: 'America/Bogota' // Valor por defecto
+  };
+}
+
+// Función para convertir datos del backend al formato del frontend
+function transformBackendData(backendData: any): WeatherData {
+  return {
+    stationId: backendData.station_id,
+    timestamp: new Date(backendData.timestamp * 1000).toISOString(), // Convertir timestamp Unix a ISO
+    temperature: {
+      current: backendData.temp || 0,
+      min: backendData.temp || 0, // En datos actuales no tenemos min/max
+      max: backendData.temp || 0,
+      feelsLike: backendData.heat_index || backendData.temp || 0,
+      avg: backendData.temp || 0,
+      unit: 'C',
+      low: backendData.temp || 0,
+      high: backendData.temp || 0
+    },
+    humidity: {
+      current: backendData.humidity || 0,
+      min: backendData.humidity || 0,
+      max: backendData.humidity || 0,
+      avg: backendData.humidity || 0,
+      low: backendData.humidity || 0,
+      high: backendData.humidity || 0
+    },
+    pressure: {
+      current: backendData.barometer ? backendData.barometer * 33.863886666667 : 0, // Convertir inHg a hPa
+      min: backendData.barometer ? backendData.barometer * 33.863886666667 : 0,
+      max: backendData.barometer ? backendData.barometer * 33.863886666667 : 0,
+      avg: backendData.barometer ? backendData.barometer * 33.863886666667 : 0,
+      trend: backendData.bar_trend > 0.01 ? 'rising' : backendData.bar_trend < -0.01 ? 'falling' : 'stable',
+      unit: 'hPa'
+    },
+    wind: {
+      speed: backendData.wind_speed_last || 0,
+      direction: backendData.wind_dir_last || 0,
+      gust: backendData.wind_speed_hi_2min || 0,
+      average: backendData.wind_speed_avg_10min || 0,
+      avg: backendData.wind_speed_avg_10min || 0,
+      max: backendData.wind_speed_hi_10min || 0,
+      unit: 'mph'
+    },
+    rain: {
+      current: backendData.rain_rate_last || 0,
+      total: backendData.rainfall_24hr || 0,
+      maxHourly: backendData.rain_rate_hi || 0,
+      intensity: backendData.rain_rate_last || 0
+    },
+    visibility: 10, // Valor por defecto, no disponible en WeatherLink
+    uvIndex: backendData.uv_index || 0
+  };
+}
+
 class WeatherAPI {
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const url = `${API_BASE_URL}${endpoint}`;
@@ -30,8 +98,8 @@ class WeatherAPI {
 
   // Estaciones
   async getStations(): Promise<WeatherStation[]> {
-    const response = await this.request<{success: boolean, data: WeatherStation[]}>('/stations');
-    return response.data;
+    const response = await this.request<{success: boolean, data: any[]}>('/stations');
+    return response.data.map(transformBackendStation);
   }
 
   async getStation(id: string): Promise<WeatherStation> {
@@ -60,11 +128,12 @@ class WeatherAPI {
 
   // Datos Meteorológicos
   async getWeatherData(stationId: string, timeRange: '24h' | '7d' | '30d' = '24h'): Promise<WeatherData[]> {
-    return this.request<WeatherData[]>(`/stations/${stationId}/weather?range=${timeRange}`);
+    return this.request<WeatherData[]>(`/data/historical?stationId=${stationId}&range=${timeRange}`);
   }
 
   async getCurrentWeather(stationId: string): Promise<WeatherData> {
-    return this.request<WeatherData>(`/stations/${stationId}/weather/current`);
+    const response = await this.request<{success: boolean, data: any}>(`/data/current/${stationId}`);
+    return transformBackendData(response.data);
   }
 
   async getHistoricalData(
@@ -72,18 +141,21 @@ class WeatherAPI {
     startDate: string, 
     endDate: string
   ): Promise<WeatherData[]> {
-    return this.request<WeatherData[]>(
-      `/stations/${stationId}/weather/historical?start=${startDate}&end=${endDate}`
+    const response = await this.request<{success: boolean, data: WeatherData[]}>(
+      `/data/historical?stationId=${stationId}&startDate=${startDate}&endDate=${endDate}`
     );
+    return response.data;
   }
 
   // Alertas
   async getAlerts(): Promise<Alert[]> {
-    return this.request<Alert[]>('/alerts');
+    const response = await this.request<{success: boolean, data: Alert[]}>('/data/alerts');
+    return response.data;
   }
 
   async getStationAlerts(stationId: string): Promise<Alert[]> {
-    return this.request<Alert[]>(`/stations/${stationId}/alerts`);
+    const response = await this.request<{success: boolean, data: Alert[]}>(`/data/alerts?stationId=${stationId}`);
+    return response.data;
   }
 
   async createAlert(alert: Omit<Alert, 'id' | 'timestamp'>): Promise<Alert> {

@@ -84,6 +84,7 @@ router.get('/historical', async (req, res) => {
       parameters: parameters ? parameters.split(',') : null
     };
 
+    const dbService = req.app.locals.dbService;
     const historicalData = await dbService.getHistoricalData(filters);
     
     res.json({
@@ -123,6 +124,7 @@ router.get('/statistics', async (req, res) => {
       groupBy
     };
 
+    const dbService = req.app.locals.dbService;
     const statistics = await dbService.getDataStatistics(filters);
     
     res.json({
@@ -148,6 +150,7 @@ router.get('/statistics', async (req, res) => {
  */
 router.get('/parameters', async (req, res) => {
   try {
+    const dbService = req.app.locals.dbService;
     const parameters = await dbService.getAvailableParameters();
     
     res.json({
@@ -188,6 +191,7 @@ router.get('/export', async (req, res) => {
     };
 
     if (format === 'csv') {
+      const dbService = req.app.locals.dbService;
       const csvData = await dbService.exportDataToCSV(filters);
       
       res.setHeader('Content-Type', 'text/csv');
@@ -214,9 +218,29 @@ router.get('/export', async (req, res) => {
  * @desc Obtener alertas meteorológicas activas
  * @access Public
  */
+router.get('/test', (req, res) => {
+  res.json({ message: 'Test endpoint working' });
+});
+
 router.get('/alerts', async (req, res) => {
   try {
+    console.log('Debug: Starting alerts endpoint');
+    console.log('Debug: req.app.locals:', Object.keys(req.app.locals || {}));
+    
+    const dbService = req.app.locals.dbService;
+    console.log('Debug: dbService type:', typeof dbService);
+    
+    if (!dbService) {
+      console.log('Debug: dbService is null/undefined');
+      return res.status(500).json({
+        success: false,
+        error: 'Servicio de base de datos no disponible'
+      });
+    }
+    
+    console.log('Debug: About to call getActiveAlerts');
     const alerts = await dbService.getActiveAlerts();
+    console.log('Debug: alerts result:', alerts);
     
     res.json({
       success: true,
@@ -224,6 +248,7 @@ router.get('/alerts', async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
+    console.log('Debug: Error occurred:', error.message);
     logger.error('Error al obtener alertas:', error);
     res.status(500).json({
       success: false,
@@ -249,6 +274,7 @@ router.post('/alerts', async (req, res) => {
       });
     }
 
+    const dbService = req.app.locals.dbService;
     const alert = await dbService.createAlert({
       stationId: parseInt(stationId),
       parameter,
