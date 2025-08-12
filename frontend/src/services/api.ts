@@ -30,7 +30,8 @@ class WeatherAPI {
 
   // Estaciones
   async getStations(): Promise<WeatherStation[]> {
-    return this.request<WeatherStation[]>('/stations');
+    const response = await this.request<{success: boolean, data: WeatherStation[]}>('/stations');
+    return response.data;
   }
 
   async getStation(id: string): Promise<WeatherStation> {
