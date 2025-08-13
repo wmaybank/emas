@@ -53,8 +53,8 @@ check_requirements() {
     fi
     
     # Verificar Docker Compose
-    if ! command -v docker-compose >/dev/null 2>&1; then
-        log "ERROR" "Docker Compose no está instalado"
+    if ! docker compose version >/dev/null 2>&1; then
+        log "ERROR" "Docker Compose no está disponible"
         exit 1
     fi
     
@@ -74,7 +74,7 @@ cleanup() {
     cd "$PROJECT_ROOT/DevOps"
     
     # Detener contenedores si están corriendo
-    docker-compose down --remove-orphans 2>/dev/null || true
+    docker compose down --remove-orphans 2>/dev/null || true
     
     # Limpiar volúmenes de desarrollo si existen
     docker volume prune -f 2>/dev/null || true
@@ -96,7 +96,7 @@ build_images() {
     
     # Construir imagen de nginx
     log "INFO" "Construyendo imagen de nginx..."
-    docker-compose build nginx
+    docker compose build nginx
     
     log "SUCCESS" "Todas las imágenes construidas exitosamente"
 }
@@ -119,8 +119,8 @@ verify_config() {
     fi
     
     # Verificar docker-compose.yml
-    if ! docker-compose config >/dev/null; then
-        log "ERROR" "Error en configuración de docker-compose"
+    if ! docker compose config >/dev/null; then
+        log "ERROR" "Error en configuración de docker compose"
         exit 1
     fi
     
@@ -135,14 +135,14 @@ start_services() {
     
     # 1. Iniciar base de datos y servicios auxiliares
     log "INFO" "Iniciando servicios auxiliares..."
-    docker-compose up -d emas-db redis prometheus
+    docker compose up -d emas-db redis prometheus
     
     # Esperar un momento para que se inicialicen
     sleep 5
     
     # 2. Iniciar aplicación principal
     log "INFO" "Iniciando aplicación principal..."
-    docker-compose up -d emas-app
+    docker compose up -d emas-app
     
     # 3. Esperar a que el backend esté listo
     log "INFO" "Esperando a que el backend esté listo..."
@@ -150,11 +150,11 @@ start_services() {
     
     # 4. Iniciar nginx
     log "INFO" "Iniciando nginx..."
-    docker-compose up -d nginx
+    docker compose up -d nginx
     
     # 5. Servicios opcionales
     log "INFO" "Iniciando servicios de respaldo..."
-    docker-compose up -d backup
+    docker compose up -d backup
     
     log "SUCCESS" "Todos los servicios iniciados"
 }
@@ -189,7 +189,7 @@ verify_deployment() {
     
     # Mostrar estado de contenedores
     log "INFO" "Estado de contenedores:"
-    docker-compose ps
+    docker compose ps
     
     # Verificar health checks
     log "INFO" "Verificando health checks..."
@@ -243,7 +243,7 @@ verify_deployment() {
 show_logs() {
     log "INFO" "Mostrando logs en tiempo real (Ctrl+C para salir)..."
     cd "$PROJECT_ROOT/DevOps"
-    docker-compose logs -f
+    docker compose logs -f
 }
 
 # Función principal
@@ -265,15 +265,15 @@ main() {
             ;;
         "status")
             cd "$PROJECT_ROOT/DevOps"
-            docker-compose ps
+            docker compose ps
             ;;
         "stop")
             cd "$PROJECT_ROOT/DevOps"
-            docker-compose down
+            docker compose down
             ;;
         "restart")
             cd "$PROJECT_ROOT/DevOps"
-            docker-compose restart
+            docker compose restart
             ;;
         *)
             echo "Uso: $0 [deploy|logs|status|stop|restart]"

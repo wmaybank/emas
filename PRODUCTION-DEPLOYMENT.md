@@ -29,7 +29,7 @@ chmod +x DevOps/scripts/deploy.sh
 cd DevOps
 
 # 2. Detener contenedores existentes
-docker-compose down --remove-orphans
+docker compose down --remove-orphans
 
 # 3. Construir imagen de la aplicación
 cd ..
@@ -37,22 +37,22 @@ docker build -t emas-weather:latest -f DevOps/Dockerfile .
 
 # 4. Construir imagen de nginx personalizada
 cd DevOps
-docker-compose build nginx
+docker compose build nginx
 
 # 5. Iniciar servicios en orden
-docker-compose up -d emas-db redis prometheus
+docker compose up -d emas-db redis prometheus
 sleep 10
 
-docker-compose up -d emas-app
+docker compose up -d emas-app
 sleep 15
 
-docker-compose up -d nginx
+docker compose up -d nginx
 sleep 5
 
-docker-compose up -d backup
+docker compose up -d backup
 
 # 6. Verificar estado
-docker-compose ps
+docker compose ps
 ```
 
 ## 🔍 Diagnóstico y Resolución de Problemas
@@ -100,7 +100,7 @@ curl http://localhost/health
 curl http://localhost:3001/api/health
 
 # Estado de todos los contenedores
-docker-compose ps
+docker compose ps
 docker stats --no-stream
 ```
 
@@ -205,8 +205,8 @@ server {
 docker ps -a | grep emas
 
 # Recrear contenedores
-docker-compose down
-docker-compose up -d
+docker compose down
+docker compose up -d
 ```
 
 ### Error: "Port already in use"
@@ -228,7 +228,7 @@ ports:
 ```bash
 # Recrear red Docker
 docker network prune
-docker-compose up -d
+docker compose up -d
 ```
 
 ### Backend no responde
@@ -241,7 +241,7 @@ docker logs emas-weather-app
 docker exec emas-weather-app env | grep -E "(PORT|HOST|NODE_ENV)"
 
 # Reiniciar solo el backend
-docker-compose restart emas-app
+docker compose restart emas-app
 ```
 
 ## 📊 Monitoreo en Producción
@@ -256,7 +256,7 @@ docker logs emas-weather-app -f
 docker logs emas-nginx -f
 
 # Logs de todos los servicios
-docker-compose logs -f
+docker compose logs -f
 ```
 
 ### Métricas con Prometheus
@@ -282,14 +282,14 @@ Si continúas teniendo problemas:
    ```bash
    ./DevOps/scripts/deploy.sh status
    curl http://localhost:8080/debug
-   docker-compose logs --tail 50
+   docker compose logs --tail 50
    ```
 
 2. Revisa los issues en GitHub: https://github.com/wmaybank/emas/issues
 
 3. Crea un nuevo issue con:
    - Logs completos de error
-   - Output del comando `docker-compose ps`
+   - Output del comando `docker compose ps`
    - Configuración de tu archivo `.env`
    - Sistema operativo y versión de Docker
 
