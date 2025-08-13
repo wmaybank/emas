@@ -10,11 +10,17 @@ Si estás teniendo problemas con el despliegue complejo, usa esta versión simpl
 # En tu servidor de producción
 cd /opt/emas/DevOps
 
-# Opción 1: Script automático (recomendado)
-chmod +x scripts/deploy-simple.sh
-./scripts/deploy-simple.sh deploy
+# Opción 1: Build automático completo (recomendado)
+chmod +x scripts/build-deploy.sh
+./scripts/build-deploy.sh build-deploy
 
-# Opción 2: Comandos manuales
+# Opción 2: Build alternativo (si hay problemas)
+./scripts/build-deploy.sh build-alternative
+
+# Opción 3: Comandos manuales
+# Primero construir frontend
+cd ../frontend && npm install && npm run build && cd ../DevOps
+# Luego desplegar
 docker compose -f docker-compose.simple.yml down --remove-orphans
 docker compose -f docker-compose.simple.yml up -d --build
 ```
@@ -88,6 +94,20 @@ docker ps | grep weather
 - `scripts/deploy-simple.sh`: Script de despliegue automático
 
 ### 🚨 Solución de Problemas
+
+#### Error: "frontend/build not found"
+**Solución**: Construir frontend primero
+```bash
+# Opción A: Script automático
+./scripts/build-deploy.sh build-deploy
+
+# Opción B: Manual
+cd ../frontend
+npm install
+npm run build
+cd ../DevOps
+docker compose -f docker-compose.simple.yml up -d --build
+```
 
 #### Error: "repository does not exist"
 **Solución**: La versión simple construye localmente, no hace pull.

@@ -1,4 +1,23 @@
-# Dockerfile para EMAS Weather Monitoring System
+# Dockerfile para EMAS Weather Monitoring System - Full Stack Build
+FROM node:18-alpine AS frontend-builder
+
+# Instalar dependencias para frontend
+WORKDIR /app
+COPY frontend/package*.json ./frontend/
+WORKDIR /app/frontend
+RUN npm ci --only=production
+
+# Copiar código fuente del frontend
+COPY frontend/src ./src
+COPY frontend/public ./public
+COPY frontend/tsconfig.json ./
+COPY frontend/tailwind.config.js ./
+COPY frontend/postcss.config.js ./
+
+# Construir frontend
+RUN npm run build
+
+# Etapa principal - Backend con frontend construido
 FROM node:18-alpine
 
 # Instalar dependencias del sistema
@@ -12,17 +31,17 @@ RUN apk update && apk add --no-cache \
 # Crear directorio de trabajo
 WORKDIR /app
 
-# Copiar package.json y package-lock.json
+# Copiar package.json principal (incluye dependencias backend)
 COPY package*.json ./
 
 # Instalar dependencias
 RUN npm install --only=production && npm cache clean --force
 
-# Copiar código fuente
+# Copiar código fuente del backend
 COPY backend/src ./src
 
-# Copiar frontend build
-COPY frontend/build ./public
+# Copiar frontend construido desde la etapa anterior
+COPY --from=frontend-builder /app/frontend/build ./public
 
 # Crear directorios necesarios
 RUN mkdir -p data logs backups config scripts
